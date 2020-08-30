@@ -7,28 +7,28 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="background" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" stylesheets="@../CSS/Client-Interface.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane id="background" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" style="-fx-background-color: a3d39c;" stylesheets="@../CSS/Client-Interface.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <AnchorPane id="chat-pane" layoutX="86.0" layoutY="43.0" prefHeight="997.0" prefWidth="1335.0" stylesheets="@../CSS/Client-Interface.css">
-         <children>
-            <AnchorPane layoutX="4.0" layoutY="803.0" prefHeight="157.0" prefWidth="1293.0">
-               <children>
-                  <Button id="attach-btn" layoutX="1070.0" layoutY="99.0" mnemonicParsing="false" prefHeight="75.0" prefWidth="98.0" stylesheets="@../CSS/Client-Interface.css" />
-                  <TextArea id="chat-txt-field" layoutX="36.0" layoutY="102.0" prefHeight="75.0" prefWidth="1022.0" stylesheets="@../CSS/Client-Interface.css" />
-                  <Button id="send-btn" layoutX="1189.0" layoutY="95.0" mnemonicParsing="false" prefHeight="75.0" prefWidth="98.0" stylesheets="@../CSS/Client-Interface.css" />
-               </children>
-            </AnchorPane>
-            <ScrollPane  accessibleRole="PARENT" hbarPolicy="NEVER"  layoutX="38.0" layoutY="29.0" prefHeight="852.0" prefWidth="1260.0"  vvalue="1.0">
-               <content>
-                  <VBox  alignment="TOP_RIGHT" prefHeight="854.0" prefWidth="1258.0" />
-               </content>
-            </ScrollPane>
-         </children>
-      </AnchorPane>
-      <Button id="logout-btn" layoutX="1488.0" layoutY="76.0" mnemonicParsing="false" prefHeight="105.0" prefWidth="384.0" stylesheets="@../CSS/Client-Interface.css" text="LOGOUT">
+      <Button id="logout-btn" layoutX="982.0" layoutY="81.0" mnemonicParsing="false" prefHeight="56.0" prefWidth="270.0" stylesheets="@../CSS/Client-Interface.css" text="LOGOUT">
          <font>
             <Font size="63.0" />
          </font>
       </Button>
+      <AnchorPane id="chat-pane" layoutX="28.0" layoutY="33.0" prefHeight="662.0" prefWidth="906.0" stylesheets="@../CSS/Client-Interface.css">
+         <children>
+            <ScrollPane accessibleRole="PARENT" hbarPolicy="NEVER" layoutX="21.0" layoutY="22.0" prefHeight="506.0" prefWidth="863.0" vvalue="1.0">
+               <content>
+                  <VBox alignment="TOP_RIGHT" prefHeight="502.0" prefWidth="754.0" />
+               </content>
+            </ScrollPane>
+            <AnchorPane layoutX="-3.0" layoutY="522.0" prefHeight="130.0" prefWidth="891.0">
+               <children>
+                  <Button id="attach-btn" layoutX="784.0" layoutY="44.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="32.0" stylesheets="@../CSS/Client-Interface.css" />
+                  <TextArea id="chat-txt-field" layoutX="21.0" layoutY="27.0" prefHeight="75.0" prefWidth="747.0" stylesheets="@../CSS/Client-Interface.css" />
+                  <Button id="send-btn" layoutX="836.0" layoutY="41.0" mnemonicParsing="false" prefHeight="48.0" prefWidth="42.0" stylesheets="@../CSS/Client-Interface.css" />
+               </children>
+            </AnchorPane>
+         </children>
+      </AnchorPane>
    </children>
 </AnchorPane>
