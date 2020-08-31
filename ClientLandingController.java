@@ -1,5 +1,3 @@
-package Controller; 
-
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -24,7 +22,7 @@ public class ClientLandingController {
         if (!isEmptyFields()) {
             Stage stage = (Stage) background.getScene().getWindow();
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("../View/Client-Interface.fxml"));
+            loader.setLocation(getClass().getResource("/View/Client-Interface.fxml"));
             Scene scene = new Scene(loader.load());
             stage.setScene(scene);
 
