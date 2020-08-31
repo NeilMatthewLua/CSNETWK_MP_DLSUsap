@@ -14,7 +14,7 @@ public class ClientLandingController {
     @FXML private TextField ipAddress; 
     @FXML private TextField portNumber; 
     @FXML private Label errorMessage; 
-    @FXML private AnchorPane background; 
+    @FXML private AnchorPane background;
 
     //Function when user presses connect btn
     @FXML 
