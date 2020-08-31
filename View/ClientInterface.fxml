@@ -23,7 +23,7 @@
             </ScrollPane>
             <AnchorPane layoutX="-3.0" layoutY="522.0" prefHeight="130.0" prefWidth="891.0">
                <children>
-                  <Button id="attach-btn" fx:id="attach_btn" layoutX="784.0" layoutY="44.0" mnemonicParsing="false" onMouseClicked="#attachFiles" prefHeight="38.0" prefWidth="32.0" stylesheets="@../CSS/Client-Interface.css" />
+                  <Button id="attach-btn" fx:id="attach_btn" layoutX="784.0" layoutY="44.0" mnemonicParsing="false" onMouseClicked="#attach" prefHeight="38.0" prefWidth="32.0" stylesheets="@../CSS/Client-Interface.css" />
                   <TextArea id="chat-txt-field" fx:id="chat_area" layoutX="21.0" layoutY="27.0" prefHeight="75.0" prefWidth="747.0" stylesheets="@../CSS/Client-Interface.css" />
                   <Button id="send-btn" fx:id="send_btn" layoutX="836.0" layoutY="41.0" mnemonicParsing="false" onMouseClicked="#send" prefHeight="48.0" prefWidth="42.0" stylesheets="@../CSS/Client-Interface.css" />
                </children>
