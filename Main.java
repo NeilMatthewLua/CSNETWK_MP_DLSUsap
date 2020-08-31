@@ -11,7 +11,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
 
         Font.loadFont(Main.class.getResource("./CSS/Lato-Bold.ttf").toExternalForm(),20);
-        Parent root = FXMLLoader.load(getClass().getResource("./View/Client-Interface.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("./View/ClientInterface.fxml"));
         primaryStage.setTitle("DLSUsap");
         primaryStage.setScene(new Scene(root, 1280, 720));
         primaryStage.setResizable(false);
