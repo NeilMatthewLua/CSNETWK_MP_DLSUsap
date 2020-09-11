@@ -5,7 +5,7 @@ import javax.imageio.ImageIO;
 import java.nio.ByteBuffer;
 import javafx.stage.FileChooser;
 
-public class Client implements Runnable{
+public class Client extends Thread{
 
     private Socket s;
     private  DataInputStream dis;
@@ -52,6 +52,7 @@ public class Client implements Runnable{
      */
     public void sendMessage(File image) throws UnknownHostException, IOException{
         try {
+            // System.out.println(image.getPath());
             BufferedImage buffImage = ImageIO.read(new File(image.getPath()));
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             ImageIO.write(buffImage, "jpg", byteArrayOutputStream);
@@ -110,6 +111,7 @@ public class Client implements Runnable{
                 if(message.equals("MESSAGE")){
                     try{
                         String chat = dis.readUTF();
+                        System.out.println(chat);
                     }
                     catch(Exception chatErr){
                         chatErr.printStackTrace();

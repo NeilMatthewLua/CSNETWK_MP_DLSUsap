@@ -1,5 +1,9 @@
 import java.io.*;
 import java.net.*;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
+import java.nio.ByteBuffer;
+import javafx.stage.FileChooser;
 
 /*
     Connection class to handle individual client connections 
@@ -87,7 +91,31 @@ public class Connection extends Thread {
                     this.server.addLog(new Log(this.source, "MESSAGE", this.dest, false, msg)); 
                 }
                 else if (msg.equals("FILE")) {
+                    try{
+                        FileChooser fileChooser = new FileChooser();
+                        fileChooser.setTitle("Save Image");
+                        
+                        File file = fileChooser.showSaveDialog(null); //Launch save image window file explorer
+                        if (file != null) {
+                            try {
+                                byte[] sizeAr = new byte[4];
+                                this.reader.read(sizeAr);
+                                int size = ByteBuffer.wrap(sizeAr).asIntBuffer().get();
 
+                                byte[] imageAr = new byte[size];
+                                this.reader.read(imageAr);
+
+                                BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageAr));
+
+                                ImageIO.write(image, "jpg", file);
+                            } catch (IOException ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+                    }
+                    catch(Exception fileErr){
+                        fileErr.printStackTrace();
+                    }
                 }
             }
             this.server.addLog(new Log(this.source, "LOGOUT")); 

@@ -32,7 +32,7 @@ public class ClientLandingController {
             try{
                 Socket s = new Socket(ipAddressVal, Integer.parseInt(portNumberVal));
                 client = new Client(s);
-
+                client.start();
                 Stage stage = (Stage) background.getScene().getWindow();
                 FXMLLoader loader = new FXMLLoader();
                 loader.setLocation(getClass().getResource("/View/Client-Interface.fxml"));
