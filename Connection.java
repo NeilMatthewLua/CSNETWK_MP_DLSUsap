@@ -4,6 +4,12 @@ import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.nio.ByteBuffer;
 import javafx.stage.FileChooser;
+import javafx.scene.Scene;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.scene.control.Label;
+import javafx.stage.*;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 /*
     Connection class to handle individual client connections 
@@ -96,22 +102,23 @@ public class Connection extends Thread {
                         fileChooser.setTitle("Save Image");
                         
                         File file = fileChooser.showSaveDialog(null); //Launch save image window file explorer
-                        if (file != null) {
-                            try {
-                                byte[] sizeAr = new byte[4];
-                                this.reader.read(sizeAr);
-                                int size = ByteBuffer.wrap(sizeAr).asIntBuffer().get();
+                        System.out.println(file.getPath());
+                        // if (file != null) {
+                        //     try {
+                        //         byte[] sizeAr = new byte[4];
+                        //         this.reader.read(sizeAr);
+                        //         int size = ByteBuffer.wrap(sizeAr).asIntBuffer().get();
 
-                                byte[] imageAr = new byte[size];
-                                this.reader.read(imageAr);
+                        //         byte[] imageAr = new byte[size];
+                        //         this.reader.read(imageAr);
 
-                                BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageAr));
+                        //         BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageAr));
 
-                                ImageIO.write(image, "jpg", file);
-                            } catch (IOException ex) {
-                                ex.printStackTrace();
-                            }
-                        }
+                        //         ImageIO.write(image, "jpg", file.getPath());
+                        //     } catch (IOException ex) {
+                        //         ex.printStackTrace();
+                        //     }
+                        // }
                     }
                     catch(Exception fileErr){
                         fileErr.printStackTrace();

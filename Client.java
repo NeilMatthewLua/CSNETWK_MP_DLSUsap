@@ -52,7 +52,7 @@ public class Client extends Thread{
      */
     public void sendMessage(File image) throws UnknownHostException, IOException{
         try {
-            // System.out.println(image.getPath());
+            System.out.println(image.getPath());
             BufferedImage buffImage = ImageIO.read(new File(image.getPath()));
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             ImageIO.write(buffImage, "jpg", byteArrayOutputStream);
