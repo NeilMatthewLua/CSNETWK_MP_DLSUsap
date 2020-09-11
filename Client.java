@@ -1,86 +1,151 @@
 import java.io.*;
 import java.net.*;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
+import java.nio.ByteBuffer;
+import javafx.stage.FileChooser;
 
-public class Client
-{
-    private String strAddress;
-    private int nPort;
+public class Client implements Runnable{
 
-    public Client (String strAddress, int nPort){
-        this.strAddress = strAddress;
-        this.nPort = nPort;
-    }
+    private Socket s;
+    private  DataInputStream dis;
+    private DataOutputStream dos;
 
-    /**
-     * Getter for the IP Address of the server
-     * @return Servers IP Address 
-     */
-    public String getAddress(){
-        return this.strAddress;
-    }
-
-    /**
-     * Getter for the port number
-     * @return Port Number
-     */
-    public int getPort(){
-        return this.nPort;
-    }
-
-    /**
-     * Opens the file explorer dialogue
-     * @return File path name
-     */
-    public String attach(){
-        System.out.println("ATTACH METHOD");
-        return "Attach";
-    } 
-
-    public static void main(String args[]) throws UnknownHostException, IOException
-    {
-        String sServerAddress = args[0];
-        int nPort = Integer.parseInt(args[1]);
-        String sender = args[2];
-        String message = sender + " " + args[3];
+    public Client (Socket socket){
         // establish the connection
-        Socket s = new Socket(sServerAddress, nPort);
-
+        this.s = socket;
         // obtaining input and out streams
-        DataInputStream dis = new DataInputStream(s.getInputStream());
-        DataOutputStream dos = new DataOutputStream(s.getOutputStream());
-        System.out.println(sender + ": Connecting to server at " + s.getRemoteSocketAddress());
-        System.out.println(sender + ": Connected to server at " + s.getRemoteSocketAddress());
+        try{
+            this.dis = new DataInputStream(this.s.getInputStream());
+            this.dos = new DataOutputStream(this.s.getOutputStream());
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+    }
 
-        // sendMessage thread
-        Thread sendMessage = new Thread(new Runnable()
-        {
-            @Override
-            public void run() {
-                try {
-                    // write on the output stream
-                    dos.writeUTF(message);
-                } catch (Exception e) {
-                    e.printStackTrace();
+    /**
+     * Getter for the Socket
+     * @return Socket
+     */
+    public Socket getSocket(){
+        return this.s;
+    }
+
+    /**
+     * Sends a message to the server towards to the other client
+     * @param strMessage Message of the sender 
+     */
+    public void sendMessage(String strMessage) throws UnknownHostException, IOException{
+        try {
+            // write on the output stream
+            this.dos.writeUTF("MESSAGE");
+            this.dos.writeUTF(strMessage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Sends an image the server towards to the other client
+     * @param image Image of the sender 
+     */
+    public void sendMessage(File image) throws UnknownHostException, IOException{
+        try {
+            BufferedImage buffImage = ImageIO.read(new File(image.getPath()));
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ImageIO.write(buffImage, "jpg", byteArrayOutputStream);
+
+            byte[] size = ByteBuffer.allocate(4).putInt(byteArrayOutputStream.size()).array();
+            // write on the output stream
+            this.dos.writeUTF("FILE");
+            this.dos.write(size);
+            this.dos.write(byteArrayOutputStream.toByteArray());
+            dos.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Sends a message and image the server towards to the other client
+     * @param strMessage Message of the sender 
+     * @param image Image of the sender 
+     */
+    public void sendMessage(String strMessage, File image) throws UnknownHostException, IOException{
+        this.sendMessage(strMessage);
+        this.sendMessage(image);
+        // try {
+        //     // write on the output stream
+        //     this.dos.writeUTF("MESSAGE");
+        //     this.dos.writeUTF(message);
+        // } catch (Exception e) {
+        //     e.printStackTrace();
+        // }
+
+
+        // try {
+        //         BufferedImage image = ImageIO.read(new File(image.getPath()));
+        //         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        //         ImageIO.write(image, "jpg", byteArrayOutputStream);
+
+        //         byte[] size = ByteBuffer.allocate(4).putInt(byteArrayOutputStream.size()).array();
+        //         // write on the output stream
+        //         this.dos.writeUTF("FILE");
+        //         this.dos.write(size);
+        //         this.dos.write(byteArrayOutputStream.toByteArray());
+        //         dos.flush();
+        // } catch (Exception e) {
+        //     e.printStackTrace();
+        // }
+    }
+
+    @Override
+    public void run(){
+        while(true){
+            try{
+                //Receives the heads up first from the server to know what kind of message will be received
+                String message = dis.readUTF();
+                //If message is a chat 
+                if(message.equals("MESSAGE")){
+                    try{
+                        String chat = dis.readUTF();
+                    }
+                    catch(Exception chatErr){
+                        chatErr.printStackTrace();
+                    }
+                }
+                else if(message.equals("FILE")){ //Message is an image
+                    try{
+                        FileChooser fileChooser = new FileChooser();
+                        fileChooser.setTitle("Save Image");
+                        
+                        File file = fileChooser.showSaveDialog(null); //Launch save image window file explorer
+                        if (file != null) {
+                            try {
+                                byte[] sizeAr = new byte[4];
+                                this.dis.read(sizeAr);
+                                int size = ByteBuffer.wrap(sizeAr).asIntBuffer().get();
+
+                                byte[] imageAr = new byte[size];
+                                this.dis.read(imageAr);
+
+                                BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageAr));
+
+                                ImageIO.write(image, "jpg", file);
+                            } catch (IOException ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+                    }
+                    catch(Exception fileErr){
+                        fileErr.printStackTrace();
+                    }
                 }
             }
-        });
-
-        // readMessage thread
-        Thread readMessage = new Thread(new Runnable()
-        {
-            @Override
-            public void run() {
-                try {
-                    // read the message sent to this client
-                    String msg = dis.readUTF();
-                    System.out.println(msg);
-                    dis.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            catch(Exception e){
+                e.printStackTrace();
             }
-        });
-        sendMessage.start();
-        readMessage.start();
+        }
     }
 }

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -23,9 +25,17 @@
             </ScrollPane>
             <AnchorPane layoutX="-3.0" layoutY="522.0" prefHeight="130.0" prefWidth="891.0">
                <children>
-                  <Button id="attach-btn" fx:id="attach_btn" layoutX="784.0" layoutY="44.0" mnemonicParsing="false" onMouseClicked="#attach" prefHeight="38.0" prefWidth="32.0" stylesheets="@../CSS/Client-Interface.css" />
-                  <TextArea id="chat-txt-field" fx:id="chat_area" layoutX="21.0" layoutY="27.0" prefHeight="75.0" prefWidth="747.0" stylesheets="@../CSS/Client-Interface.css" />
-                  <Button id="send-btn" fx:id="send_btn" layoutX="836.0" layoutY="41.0" mnemonicParsing="false" onMouseClicked="#send" prefHeight="48.0" prefWidth="42.0" stylesheets="@../CSS/Client-Interface.css" />
+                  <Button id="attach-btn" fx:id="attach_btn" layoutX="782.0" layoutY="64.0" mnemonicParsing="false" onMouseClicked="#attach" prefHeight="38.0" prefWidth="32.0" stylesheets="@../CSS/Client-Interface.css" />
+                  <TextArea id="chat-txt-field" fx:id="chat_area" layoutX="19.0" layoutY="47.0" maxWidth="747.0" minWidth="747.0" prefHeight="75.0" prefWidth="747.0" stylesheets="@../CSS/Client-Interface.css">
+                     <font>
+                        <Font size="18.0" />
+                     </font></TextArea>
+                  <Button id="send-btn" fx:id="send_btn" layoutX="834.0" layoutY="61.0" mnemonicParsing="false" onMouseClicked="#send" prefHeight="48.0" prefWidth="42.0" stylesheets="@../CSS/Client-Interface.css" />
+                  <Label fx:id="file_label" layoutX="19.0" layoutY="14.0" prefHeight="27.0" prefWidth="747.0">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                  </Label>
                </children>
             </AnchorPane>
          </children>
