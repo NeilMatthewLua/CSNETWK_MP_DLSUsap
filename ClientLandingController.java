@@ -10,25 +10,40 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 
+import java.io.*;
+import java.net.*;
+
 public class ClientLandingController {
     @FXML private TextField ipAddress; 
     @FXML private TextField portNumber; 
     @FXML private Label errorMessage; 
     @FXML private AnchorPane background;
 
+    private Client client;
+
     //Function when user presses connect btn
     @FXML 
     public void connect(MouseEvent e) throws IOException {
         if (!isEmptyFields()) {
-            Stage stage = (Stage) background.getScene().getWindow();
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("/View/Client-Interface.fxml"));
-            Scene scene = new Scene(loader.load());
-            stage.setScene(scene);
+            String ipAddressVal = ipAddress.getText().trim(); 
+            String portNumberVal = portNumber.getText().trim();
+            // System.out.println(ipAddressVal);
+            // System.out.println(portNumberVal);
+            try{
+                Socket s = new Socket(ipAddressVal, Integer.parseInt(portNumberVal));
+                client = new Client(s);
 
-            // String ipAddressVal = ipAddress.getText().trim(); 
-            // String portNumberVal = portNumber.getText().trim();
-            // ((ClientInterfaceController) loader.getController()).setClient(ipAddressVal, portNumberVal); 
+                Stage stage = (Stage) background.getScene().getWindow();
+                FXMLLoader loader = new FXMLLoader();
+                loader.setLocation(getClass().getResource("/View/Client-Interface.fxml"));
+                Scene scene = new Scene(loader.load());
+                stage.setScene(scene);
+                ((ClientInterfaceController) loader.getController()).setClient(client); 
+            }
+            catch(Exception error){
+                String errorMsgString = "Sockeet connection error"; 
+                setErrorMessage(errorMsgString);
+            }
         }
         else {
             String errorMsgString = "Please fill out all entries"; 

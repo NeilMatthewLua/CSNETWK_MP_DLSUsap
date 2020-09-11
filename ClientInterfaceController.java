@@ -33,12 +33,11 @@ public class ClientInterfaceController implements Initializable{
 
     @Override
     public void initialize(URL url, ResourceBundle rb){
-        client = new Client("localhost", 4000);
         chat_area.setWrapText(true);
     }
     
-    public void setClient(String strAddress, int nPort){
-        client = new Client(strAddress, nPort);
+    public void setClient(Client client){
+        this.client = client;
     }
     
     // //Upon clicking the attach button
@@ -58,20 +57,23 @@ public class ClientInterfaceController implements Initializable{
     public void send(MouseEvent e) throws IOException {
         try {
             String strMessage = chat_area.getText().trim();
-            if(this.File == null & !strMessage.equals("")){
+            if(this.file == null & !(strMessage.equals(""))){
                 client.sendMessage(strMessage);
             }
-            else if (!this.File == null & !strMessage.equals("")){
-                client.sendMessage(strMessage, file);
+            else if (!(this.file == null) & strMessage.equals("")){
+                client.sendMessage(this.file);
             }
-            else if (!this.File == null & strMessage.equals("")){
-                client.sendMessage(file);
+            else if (!(this.file == null) & !strMessage.equals("")){
+                client.sendMessage(strMessage, this.file);
             }
+
+            
+            file_label.setText("");
+            chat_area.setText("");
+            chat_area.requestFocus();
         } catch (Exception error) {
             error.printStackTrace();
         }
-        chat_area.setText("");
-        chat_area.requestFocus();
     }
 
     // @Override
@@ -81,6 +83,7 @@ public class ClientInterfaceController implements Initializable{
     //     text.setFill(Color.WHITE);
     //     text.getStyleClass().add("message");
     //     TextFlow tempFlow=new TextFlow();
+
     //     if(!this.username.equals(username)){
     //         Text txtName=new Text(username + "\n");
     //         txtName.getStyleClass().add("txtName");
@@ -94,25 +97,11 @@ public class ClientInterfaceController implements Initializable{
 
     //     HBox hbox=new HBox(12);
 
-    //     Circle img =new Circle(32,32,16);
-    //     try{
-    //         System.out.println(username);
-    //         String path= new File(String.format("resources/user-images/%s.png", username)).toURI().toString();
-    //         img.setFill(new ImagePattern(new Image(path)));
-    //     }catch (Exception ex){
-    //         String path= new File("resources/user-images/user.png").toURI().toString();
-    //         img.setFill(new ImagePattern(new Image(path)));
-    //     }
-
-    //     img.getStyleClass().add("imageView");
-
     //     if(!this.username.equals(username)){
-
     //         tempFlow.getStyleClass().add("tempFlowFlipped");
     //         flow.getStyleClass().add("textFlowFlipped");
     //         chatBox.setAlignment(Pos.TOP_LEFT);
     //         hbox.setAlignment(Pos.CENTER_LEFT);
-    //         hbox.getChildren().add(img);
     //         hbox.getChildren().add(flow);
 
     //     }else{
@@ -121,11 +110,9 @@ public class ClientInterfaceController implements Initializable{
     //         flow.getStyleClass().add("textFlow");
     //         hbox.setAlignment(Pos.BOTTOM_RIGHT);
     //         hbox.getChildren().add(flow);
-    //         hbox.getChildren().add(img);
     //     }
 
     //     hbox.getStyleClass().add("hbox");
-    //     Platform.runLater(() -> chatBox.getChildren().addAll(hbox));
 
     //     return true;
 
