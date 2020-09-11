@@ -81,8 +81,8 @@ public class Server
 	private void connectClients() {
 		String src1 = this.clients.get(0).getSource(); 
 		String src2 = this.clients.get(1).getSource();
-		this.clients.get(0).setDest(src1);
-		this.clients.get(1).setDest(src2); 
+		this.clients.get(0).setDest(src2);
+		this.clients.get(1).setDest(src1); 
 	}
 
 	/*
