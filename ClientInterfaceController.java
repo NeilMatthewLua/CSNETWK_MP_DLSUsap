@@ -36,8 +36,10 @@ public class ClientInterfaceController implements Initializable{
         chat_area.setWrapText(true);
     }
     
+    //Set a controller for a client
     public void setClient(Client client){
         this.client = client;
+        this.client.setController(this);
     }
     
     // //Upon clicking the attach button
@@ -54,7 +56,7 @@ public class ClientInterfaceController implements Initializable{
 
     //Upon clicking the send button
     @FXML
-    public void send(MouseEvent e) throws IOException {
+    public void send(MouseEvent e) throws IOException{
         try {
             String strMessage = chat_area.getText().trim();
             if(this.file == null & !(strMessage.equals(""))){
@@ -74,6 +76,18 @@ public class ClientInterfaceController implements Initializable{
         } catch (Exception error) {
             error.printStackTrace();
         }
+    }
+
+    @FXML
+    public void saveImage(MouseEvent e) throws IOException{
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save Image");
+        
+        File file = fileChooser.showSaveDialog(null);
+    }
+    
+    public void updateUI(){
+        System.out.println("CONTROLLER HAS RECEIVED THE NUDGE");
     }
 
     // @Override

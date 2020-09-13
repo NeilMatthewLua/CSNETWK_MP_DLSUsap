@@ -98,10 +98,7 @@ public class Connection extends Thread {
                 }
                 else if (msg.equals("FILE")) {
                     try{
-                        FileChooser fileChooser = new FileChooser();
-                        fileChooser.setTitle("Save Image");
-                        
-                        File file = fileChooser.showSaveDialog(The error is probably here); //Launch save image window file explorer
+                         //Launch save image window file explorer
                         // if (file != null) {
                         //     try {
                         //         byte[] sizeAr = new byte[4];

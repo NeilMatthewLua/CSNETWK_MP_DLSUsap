@@ -10,10 +10,12 @@ public class Client extends Thread{
     private Socket s;
     private  DataInputStream dis;
     private DataOutputStream dos;
+    private ClientInterfaceController controller;
 
     public Client (Socket socket){
         // establish the connection
         this.s = socket;
+        this.controller = null;
         // obtaining input and out streams
         try{
             this.dis = new DataInputStream(this.s.getInputStream());
@@ -30,6 +32,14 @@ public class Client extends Thread{
      */
     public Socket getSocket(){
         return this.s;
+    }
+
+    /**
+     * Setter for the Controller
+     * @param controller the controller to connect to the client
+     */
+    public void setController(ClientInterfaceController controller){
+        this.controller = controller;
     }
 
     /**
@@ -112,6 +122,7 @@ public class Client extends Thread{
                     try{
                         String chat = dis.readUTF();
                         System.out.println(chat);
+                        this.controller.updateUI();
                     }
                     catch(Exception chatErr){
                         chatErr.printStackTrace();
