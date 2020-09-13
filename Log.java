@@ -18,7 +18,7 @@ public class Log {
     private Timestamp timeSent; 
 
     /* 
-        Constructor for type LOGIN and LOGOUT
+        Constructor for type LOGIN, LOGOUT, DISCONNECT
         @param source Client that performed the log 
         @param activityType Type of the activity that was logged
     */
@@ -64,6 +64,9 @@ public class Log {
         }
         else if (this.activityType.equals("LOGOUT")) {
             return "(" + this.timeSent + ")" + this.source + ": User logged out"; 
+        }
+        else if (this.activityType.equals("DISCONNECT")) {
+            return "(" + this.timeSent + ")" + this.source + ": User disconnected";
         }
         else if (this.activityType.equals("FILE")) {
             if (this.isSender)

@@ -45,8 +45,9 @@ public class Server
 					
 					if (clients.size() == 2) 
 						this.connectClients(); 
-				}
-				
+					else 
+						client.informNoRecipient(); 
+				}	
 			}
 			
 			//Close IO streams when closing the server 
@@ -76,13 +77,38 @@ public class Server
 	}
 
 	/*
+		Removes specified object from client list 
+		@param src Connection object to be removed
+	*/
+	public void removeConnection(Connection src) {
+		this.clients.remove(src); 
+		System.out.println(clients.size()); 
+	} 
+
+	/*
 		Adds each client as the destination of the other
 	*/
 	private void connectClients() {
 		String src1 = this.clients.get(0).getSource(); 
 		String src2 = this.clients.get(1).getSource();
+		//Set the source of a client as the destination of the other
 		this.clients.get(0).setDest(src1);
 		this.clients.get(1).setDest(src2); 
+		//Inform each client that a connection has been established
+		this.clients.get(0).informConnection(); 
+		this.clients.get(1).informConnection(); 
+	}
+
+	/*
+		Sets the dest of the specified client to null  
+		@param address String src address of a client 
+	*/
+	public void disconnectClient(String address) {
+		for (Connection c : this.clients) 
+			if (c.getSource().equals(address)) {
+				c.informDisconnect(); 
+				c.setDest(null); 
+			}
 	}
 
 	/*

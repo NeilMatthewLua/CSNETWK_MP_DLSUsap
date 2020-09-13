@@ -36,7 +36,7 @@ public class ClientInterfaceController implements Initializable{
     public void initialize(URL url, ResourceBundle rb){
         chat_area.setWrapText(true);
     }
-    
+
     public void setClient(Client client){
         this.client = client;
     }
@@ -90,7 +90,6 @@ public class ClientInterfaceController implements Initializable{
         catch (Exception error) {
             System.out.println(error); 
         }
-        
     }
 
     // @Override
