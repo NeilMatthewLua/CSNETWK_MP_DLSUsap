@@ -27,6 +27,7 @@ public class ClientInterfaceController implements Initializable{
     @FXML private Button attach_btn;
     @FXML private Label  file_label;
     @FXML private TextArea chat_area;
+    @FXML private AnchorPane background;
 
     private Client client;
     private File file;
@@ -74,6 +75,22 @@ public class ClientInterfaceController implements Initializable{
         } catch (Exception error) {
             error.printStackTrace();
         }
+    }
+    //Upon clicking the logout button 
+    @FXML 
+    public void logout(MouseEvent e) throws IOException {
+        this.client.logout(); 
+        try {
+            Stage stage = (Stage) this.background.getScene().getWindow();
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/View/Client-Landing.fxml"));
+            Scene scene = new Scene(loader.load());
+            stage.setScene(scene); 
+        }
+        catch (Exception error) {
+            System.out.println(error); 
+        }
+        
     }
 
     // @Override

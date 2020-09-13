@@ -99,7 +99,11 @@ public class Server
 	}
 
 	public static void main(String[] args) {
-		int nPort = Integer.parseInt(args[0]);
+		int nPort; 
+		if (args.length != 0) 
+			nPort = Integer.parseInt(args[0]);
+		else 
+			nPort = 4000; 
 		Server s = new Server(); 
 		s.start(nPort); 
 	}

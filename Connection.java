@@ -79,7 +79,7 @@ public class Connection extends Thread {
         try {
             String msg;
             // Check what activity the user did
-            while (!(msg = reader.readUTF()).equals("END")) {
+            while (!(msg = reader.readUTF()).equals("LOGOUT")) {
                 if (msg.equals("MESSAGE")) {
                     msg = reader.readUTF();
                     System.out.println("Received message from GUI: " + msg); 

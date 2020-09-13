@@ -8,12 +8,14 @@ import javafx.stage.FileChooser;
 public class Client implements Runnable{
 
     private Socket s;
-    private  DataInputStream dis;
+    private DataInputStream dis;
     private DataOutputStream dos;
+    private boolean running; 
 
     public Client (Socket socket){
         // establish the connection
         this.s = socket;
+        this.running = true; 
         // obtaining input and out streams
         try{
             this.dis = new DataInputStream(this.s.getInputStream());
@@ -100,9 +102,22 @@ public class Client implements Runnable{
         // }
     }
 
+    /**
+     * Sends a signal to the server that the user will logout and closes the thread 
+     */
+    public void logout() {
+        try {
+            // write on the output stream
+            this.dos.writeUTF("LOGOUT");
+            this.running = false; 
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void run(){
-        while(true){
+        while(this.running){
             try{
                 //Receives the heads up first from the server to know what kind of message will be received
                 String message = dis.readUTF();
