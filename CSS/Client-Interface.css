@@ -1,0 +1,39 @@
+#background{
+    -fx-background-color: a3d39c;
+}
+
+#chat-pane{
+    -fx-background-color: ffffff;
+    -fx-background-radius: 20px;
+}
+
+#logout-btn{
+    -fx-background-color: eeda88;
+    -fx-background-radius: 35px;
+    -fx-font-family: "Lato";
+    -fx-font-size: 40px;
+}
+
+#chat-txt-field{
+    -fx-background-color: dcdcdc;
+}
+
+#chat-txt-btn-clr{
+    -fx-background-color: dcdcdc;
+}
+
+#send-btn{
+    -fx-background-color: ffffff00;
+    -fx-background-image: url('../Assets/Images/send.png');
+    -fx-background-size: 30px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: 90%;
+}
+
+#attach-btn{
+    -fx-background-color: ffffff00;
+    -fx-background-image: url('../Assets/Images/attach.png');
+    -fx-background-size: 30px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: 90%;
+}
