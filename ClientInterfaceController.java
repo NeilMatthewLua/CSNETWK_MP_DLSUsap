@@ -87,7 +87,7 @@ public class ClientInterfaceController implements Initializable{
     }
     
     public void updateUI(){
-        System.out.println("CONTROLLER HAS RECEIVED THE NUDGE");
+        System.out.println("WOW CONTROLLER HAS RECEIVED THE NUDGE, Will update now!");
     }
 
     // @Override
