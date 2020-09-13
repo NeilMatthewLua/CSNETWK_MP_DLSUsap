@@ -78,10 +78,50 @@ public class Connection extends Thread {
     }
 
     /*
+        Sends an image to the client using this connection 
+        @param message Message to be sent 
+    */
+    public void writeMessage(BufferedImage image) {
+        System.out.println("Received am image from other client"); 
+        // TODO this.server.addLog(new Log(this.source, "MESSAGE", this.dest, false, message)); 
+        try {
+            System.out.print("Last stop! I check if it's same so: ");
+            System.out.print(bufferedImagesEqual(image, ImageIO.read(new File("C:\\Users\\Neil Matthew Lua\\Desktop\\DP.jpg"))));
+            // BufferedImage buffImage = ImageIO.read(new File(image.getPath()));
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ImageIO.write(image, "jpg", byteArrayOutputStream);
+
+            byte[] size = ByteBuffer.allocate(4).putInt(byteArrayOutputStream.size()).array();
+            // write on the output stream
+            this.writer.writeUTF("FILE");
+            this.writer.write(size);
+            this.writer.write(byteArrayOutputStream.toByteArray());
+            writer.flush();
+        }
+        catch (IOException e) {
+            System.out.println("Error in writing message to client."); 
+        }
+    }
+
+    /*
         Returns String-form of source and destination attributes
     */
     public String toString() {
         return "Connection:\n Source:" + this.source + '\n' + "Destination:" + this.dest; 
+    }
+    
+    public boolean bufferedImagesEqual(BufferedImage img1, BufferedImage img2) {
+        if (img1.getWidth() == img2.getWidth() && img1.getHeight() == img2.getHeight()) {
+            for (int x = 0; x < img1.getWidth(); x++) {
+                for (int y = 0; y < img1.getHeight(); y++) {
+                    if (img1.getRGB(x, y) != img2.getRGB(x, y))
+                        return false;
+                }
+            }
+        } else {
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -89,38 +129,33 @@ public class Connection extends Thread {
         try {
             String msg;
             // Check what activity the user did
-            while (!(msg = reader.readUTF()).equals("END")) {
-                if (msg.equals("MESSAGE")) {
-                    msg = reader.readUTF();
-                    System.out.println("Received message from GUI: " + msg); 
-                    this.server.sendMessage(this.dest, msg); 
-                    this.server.addLog(new Log(this.source, "MESSAGE", this.dest, false, msg)); 
-                }
-                else if (msg.equals("FILE")) {
-                    try{
-                         //Launch save image window file explorer
-                        // if (file != null) {
-                        //     try {
-                        //         byte[] sizeAr = new byte[4];
-                        //         this.reader.read(sizeAr);
-                        //         int size = ByteBuffer.wrap(sizeAr).asIntBuffer().get();
+            // while (!(msg = reader.readUTF()).equals("END")) {
+                // if (msg.equals("MESSAGE")) {
+                //     msg = reader.readUTF();
+                //     System.out.println("Received message from GUI: " + msg); 
+                //     this.server.sendMessage(this.dest, msg); 
+                //     this.server.addLog(new Log(this.source, "MESSAGE", this.dest, false, msg)); 
+                // }
+                // else if (msg.equals("FILE")) {
+                    try {
+                        byte[] sizeAr = new byte[4];
+                        this.reader.read(sizeAr);
+                        int size = ByteBuffer.wrap(sizeAr).asIntBuffer().get();
 
-                        //         byte[] imageAr = new byte[size];
-                        //         this.reader.read(imageAr);
+                        byte[] imageAr = new byte[size];
+                        this.reader.read(imageAr);
 
-                        //         BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageAr));
+                        BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageAr));
+                        System.out.print("The server receives the image and before I pass it to the client, I check if it's same so: ");
+                        System.out.print(bufferedImagesEqual(image, ImageIO.read(new File("C:\\Users\\Neil Matthew Lua\\Desktop\\DP.jpg"))));
 
-                        //         ImageIO.write(image, "jpg", file.getPath());
-                        //     } catch (IOException ex) {
-                        //         ex.printStackTrace();
-                        //     }
-                        // }
+                        ImageIO.write(image, "jpg", new File("C:\\Users\\Neil Matthew Lua\\Desktop\\DP2.jpg"));
+                        this.server.sendMessage(this.dest, image); 
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
                     }
-                    catch(Exception fileErr){
-                        fileErr.printStackTrace();
-                    }
-                }
-            }
+                // }
+            // }
             this.server.addLog(new Log(this.source, "LOGOUT")); 
             //Close IO streams
             socket.close(); 

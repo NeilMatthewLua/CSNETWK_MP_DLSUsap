@@ -1,6 +1,10 @@
 import java.net.*;
 import java.io.*;
 import java.util.ArrayList; 
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
+import java.nio.ByteBuffer;
+import javafx.stage.FileChooser;
 
 /*
 	ChatServer class 
@@ -96,6 +100,40 @@ public class Server
 		for (Connection c : this.clients) 
 			if (c.getSource().equals(recipient))
 				c.writeMessage(message); 
+	}
+
+    public boolean bufferedImagesEqual(BufferedImage img1, BufferedImage img2) {
+        if (img1.getWidth() == img2.getWidth() && img1.getHeight() == img2.getHeight()) {
+            for (int x = 0; x < img1.getWidth(); x++) {
+                for (int y = 0; y < img1.getHeight(); y++) {
+                    if (img1.getRGB(x, y) != img2.getRGB(x, y))
+                        return false;
+                }
+            }
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+	/*
+		Sends an Image to the specified recipient 
+		@param recipient The recipient of the message
+		@param image Image to send 
+	*/
+	public void sendMessage(String recipient, BufferedImage image) {
+		System.out.println("Sending " + image + " to " + recipient);
+		try{
+			System.out.print("SERVER.JAVA Gets the buffered image, I check if it's same so: ");
+			System.out.print(bufferedImagesEqual(image, ImageIO.read(new File("C:\\Users\\Neil Matthew Lua\\Desktop\\DP.jpg")))); 
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		//Loop to find the recipient in the list
+		for (Connection c : this.clients) 
+			if (c.getSource().equals(recipient))
+				c.writeMessage(image); 
 	}
 
 	public static void main(String[] args) {
