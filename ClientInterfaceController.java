@@ -110,6 +110,7 @@ public class ClientInterfaceController implements Initializable{
         // text.getStyleClass().add("message");
 
         HBox hbox=new HBox(12);
+        hbox.setPadding(new Insets(15, 12, 15, 12));
 
         if(isSent){
             // tempFlow.getStyleClass().add("tempFlow");
@@ -149,12 +150,13 @@ public class ClientInterfaceController implements Initializable{
         save_button.setOnAction(event1); 
         
         HBox hbox=new HBox(12);
+        hbox.setPadding(new Insets(15, 12, 15, 12));
         
         if(isSent){
             Text text=new Text("You sent an image");
     
             text.setFill(Color.BLACK);
-            text.getStyleClass().add("message");
+            // text.getStyleClass().add("message");
             // tempFlow.getStyleClass().add("tempFlow");
             // flow.getStyleClass().add("textFlow");
             hbox.setAlignment(Pos.BOTTOM_RIGHT);
@@ -166,6 +168,7 @@ public class ClientInterfaceController implements Initializable{
             hbox.setAlignment(Pos.CENTER_LEFT);
             hbox.getChildren().add(save_button);
         }
+        this.file = null;
         Platform.runLater(() -> chat_box.getChildren().add(hbox));
     }
 }

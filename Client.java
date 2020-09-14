@@ -74,6 +74,7 @@ public class Client extends Thread{
             this.dos.write(size);
             this.dos.write(byteArrayOutputStream.toByteArray());
             dos.flush();
+            this.controller.updateUIImage(true, buffImage);
         } catch (Exception e) {
             e.printStackTrace();
         }
