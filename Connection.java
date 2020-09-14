@@ -3,13 +3,6 @@ import java.net.*;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.nio.ByteBuffer;
-import javafx.stage.FileChooser;
-import javafx.scene.Scene;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.scene.control.Label;
-import javafx.stage.*;
-import javafx.stage.FileChooser.ExtensionFilter;
 
 /*
     Connection class to handle individual client connections 
@@ -85,8 +78,6 @@ public class Connection extends Thread {
         System.out.println("Received am image from other client"); 
         // TODO this.server.addLog(new Log(this.source, "MESSAGE", this.dest, false, message)); 
         try {
-            System.out.print("Last stop! I check if it's same so: ");
-            System.out.print(bufferedImagesEqual(image, ImageIO.read(new File("C:\\Users\\Neil Matthew Lua\\Desktop\\DP.jpg"))));
             // BufferedImage buffImage = ImageIO.read(new File(image.getPath()));
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             ImageIO.write(image, "jpg", byteArrayOutputStream);
@@ -108,20 +99,6 @@ public class Connection extends Thread {
     */
     public String toString() {
         return "Connection:\n Source:" + this.source + '\n' + "Destination:" + this.dest; 
-    }
-    
-    public boolean bufferedImagesEqual(BufferedImage img1, BufferedImage img2) {
-        if (img1.getWidth() == img2.getWidth() && img1.getHeight() == img2.getHeight()) {
-            for (int x = 0; x < img1.getWidth(); x++) {
-                for (int y = 0; y < img1.getHeight(); y++) {
-                    if (img1.getRGB(x, y) != img2.getRGB(x, y))
-                        return false;
-                }
-            }
-        } else {
-            return false;
-        }
-        return true;
     }
 
     @Override
@@ -154,9 +131,6 @@ public class Connection extends Thread {
                             e.printStackTrace();
                         }
                         BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageAr));
-                        System.out.print("The server receives the image and before I pass it to the client, I check if it's same so: ");
-                        System.out.print(bufferedImagesEqual(image, ImageIO.read(new File("C:\\Users\\Neil Matthew Lua\\Desktop\\DP.jpg"))));
-
                         this.server.sendMessage(this.dest, image); 
                     } catch (IOException ex) {
                         ex.printStackTrace();

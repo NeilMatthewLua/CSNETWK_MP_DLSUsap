@@ -51,7 +51,6 @@ public class Client extends Thread{
             // write on the output stream
             this.dos.writeUTF("MESSAGE");
             this.dos.writeUTF(strMessage);
-            System.out.println("I sent this: " + strMessage);
             this.controller.updateUIMessage(true, strMessage);
         } catch (Exception e) {
             e.printStackTrace();
@@ -70,9 +69,6 @@ public class Client extends Thread{
             ImageIO.write(buffImage, "jpg", byteArrayOutputStream);
 
             byte[] size = ByteBuffer.allocate(4).putInt(byteArrayOutputStream.size()).array();
-
-            System.out.print("Just before I send, I check if it's same so: ");
-            System.out.print(bufferedImagesEqual(buffImage, ImageIO.read(new File("C:\\Users\\Neil Matthew Lua\\Desktop\\DP.jpg"))));
 
             // write on the output stream
             this.dos.write(size);
@@ -115,6 +111,12 @@ public class Client extends Thread{
         //     e.printStackTrace();
         // }
     }
+
+    /**
+     * Saves an image to the local machine
+     * @param image Image of the sender 
+     * @param file File object to path 
+     */
     public void saveImage(BufferedImage image, File file){
         try{
             ImageIO.write(image, "jpg", new File(file.getPath() + ".jpg"));
@@ -122,20 +124,6 @@ public class Client extends Thread{
         catch(Exception e){
             e.printStackTrace();
         }
-    }
-
-    public boolean bufferedImagesEqual(BufferedImage img1, BufferedImage img2) {
-        if (img1.getWidth() == img2.getWidth() && img1.getHeight() == img2.getHeight()) {
-            for (int x = 0; x < img1.getWidth(); x++) {
-                for (int y = 0; y < img1.getHeight(); y++) {
-                    if (img1.getRGB(x, y) != img2.getRGB(x, y))
-                        return false;
-                }
-            }
-        } else {
-            return false;
-        }
-        return true;
     }
 
     @Override
@@ -148,7 +136,6 @@ public class Client extends Thread{
                 if(message.equals("MESSAGE")){
                     try{
                         String chat = dis.readUTF();
-                        System.out.println("I received this: " + chat);
                         this.controller.updateUIMessage(false, chat);
                     }
                     catch(Exception chatErr){
@@ -173,8 +160,6 @@ public class Client extends Thread{
                             e.printStackTrace();
                         }
                         BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageAr));
-                        System.out.print("By the time I receive an image, I check if it's same so: ");
-                        System.out.print(bufferedImagesEqual(image, ImageIO.read(new File("C:\\Users\\Neil Matthew Lua\\Desktop\\DP.jpg"))));
 
                         this.controller.updateUIImage(false, image);
                     } catch (IOException ex) {
