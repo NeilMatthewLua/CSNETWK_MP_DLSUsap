@@ -77,12 +77,20 @@ public class Server
 	}
 
 	/*
-		Removes specified object from client list 
+		Removes specified object from client list and informs other client of disconnect 
 		@param src Connection object to be removed
 	*/
 	public void removeConnection(Connection src) {
+		String address = src.getDest(); 
 		this.clients.remove(src); 
 		System.out.println(clients.size()); 
+		for (Connection c : this.clients) 
+			if (c.getSource().equals(address)) {
+				//
+				c.informDisconnect(); 
+				//Remove dest address from the other client
+				c.setDest(null); 
+			}
 	} 
 
 	/*
@@ -97,18 +105,6 @@ public class Server
 		//Inform each client that a connection has been established
 		this.clients.get(0).informConnection(); 
 		this.clients.get(1).informConnection(); 
-	}
-
-	/*
-		Sets the dest of the specified client to null  
-		@param address String src address of a client 
-	*/
-	public void disconnectClient(String address) {
-		for (Connection c : this.clients) 
-			if (c.getSource().equals(address)) {
-				c.informDisconnect(); 
-				c.setDest(null); 
-			}
 	}
 
 	/*

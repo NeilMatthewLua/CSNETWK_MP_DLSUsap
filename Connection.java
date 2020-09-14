@@ -46,6 +46,14 @@ public class Connection extends Thread {
     }
 
     /*
+        Getter for the dest attribute 
+        @return String destination address of the connection 
+    */
+    public String getDest() {
+        return this.dest; 
+    }
+
+    /*
         Setter for the destination attribute
     */
     public void setDest(String d) {
