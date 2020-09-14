@@ -64,7 +64,7 @@ public class Client extends Thread{
      */
     public void sendMessage(File image) throws UnknownHostException, IOException{
         try {
-            // this.dos.writeUTF("FILE");
+            this.dos.writeUTF("FILE");
             BufferedImage buffImage = ImageIO.read(new File(image.getPath()));
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             ImageIO.write(buffImage, "jpg", byteArrayOutputStream);
@@ -162,8 +162,16 @@ public class Client extends Thread{
                         int size = ByteBuffer.wrap(sizeAr).asIntBuffer().get();
 
                         byte[] imageAr = new byte[size];
-                        this.dis.read(imageAr);
-
+                        int read = 0;
+                        try{
+                            while(read < size)
+                            {
+                                read += this.dis.read(imageAr,read,size-read); 
+                            }
+                        }
+                        catch (EOFException e){
+                            e.printStackTrace();
+                        }
                         BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageAr));
                         System.out.print("By the time I receive an image, I check if it's same so: ");
                         System.out.print(bufferedImagesEqual(image, ImageIO.read(new File("C:\\Users\\Neil Matthew Lua\\Desktop\\DP.jpg"))));

@@ -125,14 +125,6 @@ public class ClientInterfaceController implements Initializable{
         Platform.runLater(() -> chat_box.getChildren().add(hbox));
     }
 
-    @FXML
-    public void saveImage(MouseEvent e) throws IOException{
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Save Image");
-        
-        File file = fileChooser.showSaveDialog(null);
-    }
-
     public void updateUIImage(boolean isSent, BufferedImage image){   
         // create a Button 
         Button save_button = new Button("Download Image"); 
@@ -155,24 +147,25 @@ public class ClientInterfaceController implements Initializable{
         }; 
   
         save_button.setOnAction(event1); 
-        // Text text=new Text(strMessage);
-
-        // text.setFill(Color.BLACK);
-        // text.getStyleClass().add("message");
-
+        
         HBox hbox=new HBox(12);
-
+        
         if(isSent){
+            Text text=new Text("You sent an image");
+    
+            text.setFill(Color.BLACK);
+            text.getStyleClass().add("message");
             // tempFlow.getStyleClass().add("tempFlow");
             // flow.getStyleClass().add("textFlow");
             hbox.setAlignment(Pos.BOTTOM_RIGHT);
+            hbox.getChildren().add(text);
         }else{
             // tempFlow.getStyleClass().add("tempFlowFlipped");
             // flow.getStyleClass().add("textFlowFlipped");
             chat_box.setAlignment(Pos.TOP_LEFT);
             hbox.setAlignment(Pos.CENTER_LEFT);
+            hbox.getChildren().add(save_button);
         }
-        hbox.getChildren().add(save_button);
         Platform.runLater(() -> chat_box.getChildren().add(hbox));
     }
 }

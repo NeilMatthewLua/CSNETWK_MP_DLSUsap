@@ -129,33 +129,40 @@ public class Connection extends Thread {
         try {
             String msg;
             // Check what activity the user did
-            // while (!(msg = reader.readUTF()).equals("END")) {
-                // if (msg.equals("MESSAGE")) {
-                //     msg = reader.readUTF();
-                //     System.out.println("Received message from GUI: " + msg); 
-                //     this.server.sendMessage(this.dest, msg); 
-                //     this.server.addLog(new Log(this.source, "MESSAGE", this.dest, false, msg)); 
-                // }
-                // else if (msg.equals("FILE")) {
+            while (!(msg = reader.readUTF()).equals("END")) {
+                if (msg.equals("MESSAGE")) {
+                    msg = reader.readUTF();
+                    System.out.println("Received message from GUI: " + msg); 
+                    this.server.sendMessage(this.dest, msg); 
+                    this.server.addLog(new Log(this.source, "MESSAGE", this.dest, false, msg)); 
+                }
+                else if (msg.equals("FILE")) {
                     try {
                         byte[] sizeAr = new byte[4];
                         this.reader.read(sizeAr);
                         int size = ByteBuffer.wrap(sizeAr).asIntBuffer().get();
 
                         byte[] imageAr = new byte[size];
-                        this.reader.read(imageAr);
-
+                        int read = 0;
+                        try{
+                            while(read < size)
+                            {
+                                read += this.reader.read(imageAr,read,size-read); 
+                            }
+                        }
+                        catch (EOFException e){
+                            e.printStackTrace();
+                        }
                         BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageAr));
                         System.out.print("The server receives the image and before I pass it to the client, I check if it's same so: ");
                         System.out.print(bufferedImagesEqual(image, ImageIO.read(new File("C:\\Users\\Neil Matthew Lua\\Desktop\\DP.jpg"))));
 
-                        ImageIO.write(image, "jpg", new File("C:\\Users\\Neil Matthew Lua\\Desktop\\DP2.jpg"));
                         this.server.sendMessage(this.dest, image); 
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
-                // }
-            // }
+                }
+            }
             this.server.addLog(new Log(this.source, "LOGOUT")); 
             //Close IO streams
             socket.close(); 
