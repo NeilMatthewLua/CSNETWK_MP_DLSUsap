@@ -5,16 +5,18 @@ import javax.imageio.ImageIO;
 import java.nio.ByteBuffer;
 import javafx.stage.FileChooser;
 
-public class Client implements Runnable{
+public class Client extends Thread{
 
     private Socket s;
     private DataInputStream dis;
     private DataOutputStream dos;
+    private ClientInterfaceController controller;
     private boolean running; 
 
     public Client (Socket socket){
         // establish the connection
         this.s = socket;
+        this.controller = null;
         this.running = true; 
         // obtaining input and out streams
         try{
@@ -35,6 +37,14 @@ public class Client implements Runnable{
     }
 
     /**
+     * Setter for the Controller
+     * @param controller the controller to connect to the client
+     */
+    public void setController(ClientInterfaceController controller){
+        this.controller = controller;
+    }
+
+    /**
      * Sends a message to the server towards to the other client
      * @param strMessage Message of the sender 
      */
@@ -43,6 +53,7 @@ public class Client implements Runnable{
             // write on the output stream
             this.dos.writeUTF("MESSAGE");
             this.dos.writeUTF(strMessage);
+            this.controller.updateUIMessage(true, strMessage);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -54,16 +65,18 @@ public class Client implements Runnable{
      */
     public void sendMessage(File image) throws UnknownHostException, IOException{
         try {
+            this.dos.writeUTF("FILE");
             BufferedImage buffImage = ImageIO.read(new File(image.getPath()));
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             ImageIO.write(buffImage, "jpg", byteArrayOutputStream);
 
             byte[] size = ByteBuffer.allocate(4).putInt(byteArrayOutputStream.size()).array();
+
             // write on the output stream
-            this.dos.writeUTF("FILE");
             this.dos.write(size);
             this.dos.write(byteArrayOutputStream.toByteArray());
             dos.flush();
+            this.controller.updateUIImage(true, buffImage);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -103,6 +116,18 @@ public class Client implements Runnable{
     }
 
     /**
+     * Saves an image to the local machine
+     * @param image Image of the sender 
+     * @param file File object to path 
+     */
+    public void saveImage(BufferedImage image, File file){
+        try{
+            ImageIO.write(image, "jpg", new File(file.getPath() + ".jpg"));
+        }
+        catch(Exception e){
+      }
+      
+    /**
      * Sends a signal to the server that the user will logout and closes the thread 
      */
     public void logout() {
@@ -125,36 +150,34 @@ public class Client implements Runnable{
                 if(message.equals("MESSAGE")){
                     try{
                         String chat = dis.readUTF();
+                        this.controller.updateUIMessage(false, chat);
                     }
                     catch(Exception chatErr){
                         chatErr.printStackTrace();
                     }
                 }
                 else if(message.equals("FILE")){ //Message is an image
-                    try{
-                        FileChooser fileChooser = new FileChooser();
-                        fileChooser.setTitle("Save Image");
-                        
-                        File file = fileChooser.showSaveDialog(null); //Launch save image window file explorer
-                        if (file != null) {
-                            try {
-                                byte[] sizeAr = new byte[4];
-                                this.dis.read(sizeAr);
-                                int size = ByteBuffer.wrap(sizeAr).asIntBuffer().get();
+                    try {
+                        byte[] sizeAr = new byte[4];
+                        this.dis.read(sizeAr);
+                        int size = ByteBuffer.wrap(sizeAr).asIntBuffer().get();
 
-                                byte[] imageAr = new byte[size];
-                                this.dis.read(imageAr);
-
-                                BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageAr));
-
-                                ImageIO.write(image, "jpg", file);
-                            } catch (IOException ex) {
-                                ex.printStackTrace();
+                        byte[] imageAr = new byte[size];
+                        int read = 0;
+                        try{
+                            while(read < size)
+                            {
+                                read += this.dis.read(imageAr,read,size-read); 
                             }
                         }
-                    }
-                    catch(Exception fileErr){
-                        fileErr.printStackTrace();
+                        catch (EOFException e){
+                            e.printStackTrace();
+                        }
+                        BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageAr));
+
+                        this.controller.updateUIImage(false, image);
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
                     }
                 }
             }

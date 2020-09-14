@@ -1,5 +1,8 @@
 import java.io.*;
 import java.net.*;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
+import java.nio.ByteBuffer;
 
 /*
     Connection class to handle individual client connections 
@@ -76,6 +79,29 @@ public class Connection extends Thread {
     }
 
     /*
+        Sends an image to the client using this connection 
+        @param message Message to be sent 
+    */
+    public void writeMessage(BufferedImage image) {
+        System.out.println("Received am image from other client"); 
+        // TODO this.server.addLog(new Log(this.source, "MESSAGE", this.dest, false, message)); 
+        try {
+            // BufferedImage buffImage = ImageIO.read(new File(image.getPath()));
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ImageIO.write(image, "jpg", byteArrayOutputStream);
+
+            byte[] size = ByteBuffer.allocate(4).putInt(byteArrayOutputStream.size()).array();
+            // write on the output stream
+            this.writer.writeUTF("FILE");
+            this.writer.write(size);
+            this.writer.write(byteArrayOutputStream.toByteArray());
+            writer.flush();
+        }
+        catch (IOException e) {
+            System.out.println("Error in writing message to client."); 
+        }
+      
+    /**
         Informs client that there is no recipient on the other end
     */
     public void informNoRecipient() {
@@ -152,7 +178,27 @@ public class Connection extends Thread {
                     this.server.addLog(new Log(this.source, "MESSAGE", this.dest, false, msg)); 
                 }
                 else if (msg.equals("FILE")) {
+                    try {
+                        byte[] sizeAr = new byte[4];
+                        this.reader.read(sizeAr);
+                        int size = ByteBuffer.wrap(sizeAr).asIntBuffer().get();
 
+                        byte[] imageAr = new byte[size];
+                        int read = 0;
+                        try{
+                            while(read < size)
+                            {
+                                read += this.reader.read(imageAr,read,size-read); 
+                            }
+                        }
+                        catch (EOFException e){
+                            e.printStackTrace();
+                        }
+                        BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageAr));
+                        this.server.sendMessage(this.dest, image); 
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
                 }
             }
             //Perform final cleanup before closing
