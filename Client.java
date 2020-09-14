@@ -13,7 +13,7 @@ public class Client extends Thread{
     private ClientInterfaceController controller;
     private boolean running; 
 
-    public Client (Socket socket){
+    public Client(Socket socket){
         // establish the connection
         this.s = socket;
         this.controller = null;
@@ -90,29 +90,6 @@ public class Client extends Thread{
     public void sendMessage(String strMessage, File image) throws UnknownHostException, IOException{
         this.sendMessage(strMessage);
         this.sendMessage(image);
-        // try {
-        //     // write on the output stream
-        //     this.dos.writeUTF("MESSAGE");
-        //     this.dos.writeUTF(message);
-        // } catch (Exception e) {
-        //     e.printStackTrace();
-        // }
-
-
-        // try {
-        //         BufferedImage image = ImageIO.read(new File(image.getPath()));
-        //         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        //         ImageIO.write(image, "jpg", byteArrayOutputStream);
-
-        //         byte[] size = ByteBuffer.allocate(4).putInt(byteArrayOutputStream.size()).array();
-        //         // write on the output stream
-        //         this.dos.writeUTF("FILE");
-        //         this.dos.write(size);
-        //         this.dos.write(byteArrayOutputStream.toByteArray());
-        //         dos.flush();
-        // } catch (Exception e) {
-        //     e.printStackTrace();
-        // }
     }
 
     /**
@@ -127,6 +104,7 @@ public class Client extends Thread{
         catch(Exception e){
         }
     }
+    
     /**     
      * Sends a signal to the server that the user will logout and closes the thread 
      */
@@ -179,6 +157,15 @@ public class Client extends Thread{
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
+                }
+                else if (message.equals("NO CLIENT")){
+                    this.controller.toggleChat(false, "Waiting for other client");
+                }
+                else if (message.equals("CONNECTION ESTABLISHED")){
+                    this.controller.toggleChat(true,"");
+                }
+                else if (message.equals("DISCONNECT")){
+                    this.controller.toggleChat(false, "Other client Disconnected");
                 }
             }
             catch(Exception e){

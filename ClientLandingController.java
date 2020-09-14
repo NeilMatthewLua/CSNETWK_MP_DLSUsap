@@ -32,18 +32,18 @@ public class ClientLandingController {
             try{
                 Socket s = new Socket(ipAddressVal, Integer.parseInt(portNumberVal));
                 client = new Client(s);
-                client.start();
                 Stage stage = (Stage) background.getScene().getWindow();
                 FXMLLoader loader = new FXMLLoader();
                 loader.setLocation(getClass().getResource("/View/Client-Interface.fxml"));
                 Scene scene = new Scene(loader.load());
                 stage.setScene(scene);
                 //Close stage handler to logout user on stage close
-                stage.setOnHiding( event -> {
+                stage.setOnHiding(event -> {
                     System.out.println("Closing Stage");
                     this.client.logout(); 
                 });
                 ((ClientInterfaceController) loader.getController()).setClient(client); 
+                client.start();
             }
             catch(Exception error){
                 System.out.println(error); 

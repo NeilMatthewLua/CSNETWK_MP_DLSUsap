@@ -101,7 +101,8 @@ public class Connection extends Thread {
             System.out.println("Error in writing message to client."); 
         }
     }
-    /*
+     
+    /**
         Informs client that there is no recipient on the other end
     */
     public void informNoRecipient() {

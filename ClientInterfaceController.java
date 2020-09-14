@@ -47,10 +47,12 @@ public class ClientInterfaceController implements Initializable{
     @FXML private Button send_btn;
     @FXML private Button attach_btn;
     @FXML private Label  file_label;
+    @FXML private Label  label_msg;
     @FXML private TextArea chat_area;
     @FXML private ScrollPane scroll_chat;
     @FXML private VBox chat_box;
     @FXML private AnchorPane background;
+    @FXML private AnchorPane chat_pane;
 
     private Client client;
     private File file;
@@ -61,14 +63,14 @@ public class ClientInterfaceController implements Initializable{
         scroll_chat.vvalueProperty().bind(chat_box.heightProperty());
         chat_box.setPadding(new Insets(10, 50, 10, 50));
     }
-    
+  
     //Set a controller for a client
     public void setClient(Client client){
         this.client = client;
         this.client.setController(this);
     }
     
-    // //Upon clicking the attach button
+    //Upon clicking the attach button
     @FXML
     public void attach(MouseEvent e) throws IOException{
         FileChooser fileChooser = new FileChooser();
@@ -143,6 +145,7 @@ public class ClientInterfaceController implements Initializable{
         }
     }
 
+    @FXML
     public void updateUIImage(boolean isSent, BufferedImage image){   
         // create a Button 
         Button save_button = new Button("Download Image"); 
@@ -187,5 +190,11 @@ public class ClientInterfaceController implements Initializable{
         }
         this.file = null;
         Platform.runLater(() -> chat_box.getChildren().add(hbox));
+    }
+
+    @FXML
+    public void toggleChat(boolean isVisible, String strMessage){
+        Platform.runLater(() -> label_msg.setText(strMessage));
+        Platform.runLater(() -> chat_pane.setVisible(isVisible));
     }
 }
