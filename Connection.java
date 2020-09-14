@@ -3,6 +3,13 @@ import java.net.*;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.nio.ByteBuffer;
+import javafx.stage.FileChooser;
+import javafx.scene.Scene;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.scene.control.Label;
+import javafx.stage.*;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 /*
     Connection class to handle individual client connections 
@@ -71,30 +78,6 @@ public class Connection extends Thread {
     }
 
     /*
-        Sends an image to the client using this connection 
-        @param message Message to be sent 
-    */
-    public void writeMessage(BufferedImage image) {
-        System.out.println("Received am image from other client"); 
-        // TODO this.server.addLog(new Log(this.source, "MESSAGE", this.dest, false, message)); 
-        try {
-            // BufferedImage buffImage = ImageIO.read(new File(image.getPath()));
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            ImageIO.write(image, "jpg", byteArrayOutputStream);
-
-            byte[] size = ByteBuffer.allocate(4).putInt(byteArrayOutputStream.size()).array();
-            // write on the output stream
-            this.writer.writeUTF("FILE");
-            this.writer.write(size);
-            this.writer.write(byteArrayOutputStream.toByteArray());
-            writer.flush();
-        }
-        catch (IOException e) {
-            System.out.println("Error in writing message to client."); 
-        }
-    }
-
-    /*
         Returns String-form of source and destination attributes
     */
     public String toString() {
@@ -114,26 +97,27 @@ public class Connection extends Thread {
                     this.server.addLog(new Log(this.source, "MESSAGE", this.dest, false, msg)); 
                 }
                 else if (msg.equals("FILE")) {
-                    try {
-                        byte[] sizeAr = new byte[4];
-                        this.reader.read(sizeAr);
-                        int size = ByteBuffer.wrap(sizeAr).asIntBuffer().get();
+                    try{
+                         //Launch save image window file explorer
+                        // if (file != null) {
+                        //     try {
+                        //         byte[] sizeAr = new byte[4];
+                        //         this.reader.read(sizeAr);
+                        //         int size = ByteBuffer.wrap(sizeAr).asIntBuffer().get();
 
-                        byte[] imageAr = new byte[size];
-                        int read = 0;
-                        try{
-                            while(read < size)
-                            {
-                                read += this.reader.read(imageAr,read,size-read); 
-                            }
-                        }
-                        catch (EOFException e){
-                            e.printStackTrace();
-                        }
-                        BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageAr));
-                        this.server.sendMessage(this.dest, image); 
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
+                        //         byte[] imageAr = new byte[size];
+                        //         this.reader.read(imageAr);
+
+                        //         BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageAr));
+
+                        //         ImageIO.write(image, "jpg", file.getPath());
+                        //     } catch (IOException ex) {
+                        //         ex.printStackTrace();
+                        //     }
+                        // }
+                    }
+                    catch(Exception fileErr){
+                        fileErr.printStackTrace();
                     }
                 }
             }

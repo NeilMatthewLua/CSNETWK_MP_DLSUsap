@@ -1,14 +1,10 @@
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.control.ScrollPane;
 import java.io.IOException;
 import java.io.File;
 import java.net.URL;
@@ -23,23 +19,6 @@ import javafx.stage.Stage;
 import javafx.scene.control.Label;
 import javafx.stage.*;
 import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.ImagePattern;
-import javafx.scene.shape.Circle;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
-import javafx.scene.text.TextFlow;
-import javafx.application.Platform;
-import javafx.event.ActionEvent; 
-import javafx.event.EventHandler; 
-import java.awt.image.BufferedImage;
-import javax.imageio.ImageIO;
-import java.nio.ByteBuffer;
-import javafx.stage.FileChooser;
 
 public class ClientInterfaceController implements Initializable{
 
@@ -48,8 +27,6 @@ public class ClientInterfaceController implements Initializable{
     @FXML private Button attach_btn;
     @FXML private Label  file_label;
     @FXML private TextArea chat_area;
-    @FXML private ScrollPane scroll_chat;
-    @FXML private VBox chat_box;
 
     private Client client;
     private File file;
@@ -57,8 +34,6 @@ public class ClientInterfaceController implements Initializable{
     @Override
     public void initialize(URL url, ResourceBundle rb){
         chat_area.setWrapText(true);
-        scroll_chat.vvalueProperty().bind(chat_box.heightProperty());
-        chat_box.setPadding(new Insets(10, 50, 10, 50));
     }
     
     //Set a controller for a client
@@ -102,73 +77,59 @@ public class ClientInterfaceController implements Initializable{
             error.printStackTrace();
         }
     }
+
+    @FXML
+    public void saveImage(MouseEvent e) throws IOException{
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save Image");
+        
+        File file = fileChooser.showSaveDialog(null);
+    }
     
-    public void updateUIMessage(boolean isSent, String strMessage){   
-        Text text=new Text(strMessage);
-
-        text.setFill(Color.BLACK);
-        // text.getStyleClass().add("message");
-
-        HBox hbox=new HBox(12);
-        hbox.setPadding(new Insets(15, 12, 15, 12));
-
-        if(isSent){
-            // tempFlow.getStyleClass().add("tempFlow");
-            // flow.getStyleClass().add("textFlow");
-            hbox.setAlignment(Pos.BOTTOM_RIGHT);
-        }else{
-            // tempFlow.getStyleClass().add("tempFlowFlipped");
-            // flow.getStyleClass().add("textFlowFlipped");
-            chat_box.setAlignment(Pos.TOP_LEFT);
-            hbox.setAlignment(Pos.CENTER_LEFT);
-        }
-        hbox.getChildren().add(text);
-        Platform.runLater(() -> chat_box.getChildren().add(hbox));
+    public void updateUI(){
+        System.out.println("WOW CONTROLLER HAS RECEIVED THE NUDGE, Will update now!");
     }
 
-    public void updateUIImage(boolean isSent, BufferedImage image){   
-        // create a Button 
-        Button save_button = new Button("Download Image"); 
-  
-        // create an Event Handler 
-        EventHandler<ActionEvent> event1 =  
-         new EventHandler<ActionEvent>() { 
-  
-            public void handle(ActionEvent e) 
-            { 
-                FileChooser fileChooser = new FileChooser();
-                fileChooser.setTitle("Save Image");
-                
-                File file = fileChooser.showSaveDialog(null);
-  
-                if (file != null) { 
-                    client.saveImage(image, file);
-                } 
-            } 
-        }; 
-  
-        save_button.setOnAction(event1); 
-        
-        HBox hbox=new HBox(12);
-        hbox.setPadding(new Insets(15, 12, 15, 12));
-        
-        if(isSent){
-            Text text=new Text("You sent an image");
-    
-            text.setFill(Color.BLACK);
-            // text.getStyleClass().add("message");
-            // tempFlow.getStyleClass().add("tempFlow");
-            // flow.getStyleClass().add("textFlow");
-            hbox.setAlignment(Pos.BOTTOM_RIGHT);
-            hbox.getChildren().add(text);
-        }else{
-            // tempFlow.getStyleClass().add("tempFlowFlipped");
-            // flow.getStyleClass().add("textFlowFlipped");
-            chat_box.setAlignment(Pos.TOP_LEFT);
-            hbox.setAlignment(Pos.CENTER_LEFT);
-            hbox.getChildren().add(save_button);
-        }
-        this.file = null;
-        Platform.runLater(() -> chat_box.getChildren().add(hbox));
-    }
+    // @Override
+    // public boolean update(String username,String message) throws RemoteException {
+    //     Text text=new Text(message);
+
+    //     text.setFill(Color.WHITE);
+    //     text.getStyleClass().add("message");
+    //     TextFlow tempFlow=new TextFlow();
+
+    //     if(!this.username.equals(username)){
+    //         Text txtName=new Text(username + "\n");
+    //         txtName.getStyleClass().add("txtName");
+    //         tempFlow.getChildren().add(txtName);
+    //     }
+
+    //     tempFlow.getChildren().add(text);
+    //     tempFlow.setMaxWidth(200);
+
+    //     TextFlow flow=new TextFlow(tempFlow);
+
+    //     HBox hbox=new HBox(12);
+
+    //     if(!this.username.equals(username)){
+    //         tempFlow.getStyleClass().add("tempFlowFlipped");
+    //         flow.getStyleClass().add("textFlowFlipped");
+    //         chatBox.setAlignment(Pos.TOP_LEFT);
+    //         hbox.setAlignment(Pos.CENTER_LEFT);
+    //         hbox.getChildren().add(flow);
+
+    //     }else{
+    //         text.setFill(Color.WHITE);
+    //         tempFlow.getStyleClass().add("tempFlow");
+    //         flow.getStyleClass().add("textFlow");
+    //         hbox.setAlignment(Pos.BOTTOM_RIGHT);
+    //         hbox.getChildren().add(flow);
+    //     }
+
+    //     hbox.getStyleClass().add("hbox");
+
+    //     return true;
+
+    // }
+
 }

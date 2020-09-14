@@ -41,7 +41,7 @@ public class ClientLandingController {
                 ((ClientInterfaceController) loader.getController()).setClient(client); 
             }
             catch(Exception error){
-                String errorMsgString = "Socket connection error"; 
+                String errorMsgString = "Sockeet connection error"; 
                 setErrorMessage(errorMsgString);
             }
         }
