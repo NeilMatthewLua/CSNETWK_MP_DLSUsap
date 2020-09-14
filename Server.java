@@ -49,8 +49,9 @@ public class Server
 					
 					if (clients.size() == 2) 
 						this.connectClients(); 
-				}
-				
+					else 
+						client.informNoRecipient(); 
+				}	
 			}
 			
 			//Close IO streams when closing the server 
@@ -80,13 +81,34 @@ public class Server
 	}
 
 	/*
+		Removes specified object from client list and informs other client of disconnect 
+		@param src Connection object to be removed
+	*/
+	public void removeConnection(Connection src) {
+		String address = src.getDest(); 
+		this.clients.remove(src); 
+		System.out.println(clients.size()); 
+		for (Connection c : this.clients) 
+			if (c.getSource().equals(address)) {
+				//
+				c.informDisconnect(); 
+				//Remove dest address from the other client
+				c.setDest(null); 
+			}
+	} 
+
+	/*
 		Adds each client as the destination of the other
 	*/
 	private void connectClients() {
 		String src1 = this.clients.get(0).getSource(); 
 		String src2 = this.clients.get(1).getSource();
-		this.clients.get(0).setDest(src2);
-		this.clients.get(1).setDest(src1); 
+		//Set the source of a client as the destination of the other
+		this.clients.get(0).setDest(src1);
+		this.clients.get(1).setDest(src2); 
+		//Inform each client that a connection has been established
+		this.clients.get(0).informConnection(); 
+		this.clients.get(1).informConnection(); 
 	}
 
 	/*
@@ -116,7 +138,11 @@ public class Server
 	}
 
 	public static void main(String[] args) {
-		int nPort = Integer.parseInt(args[0]);
+		int nPort; 
+		if (args.length != 0) 
+			nPort = Integer.parseInt(args[0]);
+		else 
+			nPort = 4000; 
 		Server s = new Server(); 
 		s.start(nPort); 
 	}
