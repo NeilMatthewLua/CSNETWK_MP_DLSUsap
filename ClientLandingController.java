@@ -38,9 +38,15 @@ public class ClientLandingController {
                 loader.setLocation(getClass().getResource("/View/Client-Interface.fxml"));
                 Scene scene = new Scene(loader.load());
                 stage.setScene(scene);
+                //Close stage handler to logout user on stage close
+                stage.setOnHiding( event -> {
+                    System.out.println("Closing Stage");
+                    this.client.logout(); 
+                });
                 ((ClientInterfaceController) loader.getController()).setClient(client); 
             }
             catch(Exception error){
+                System.out.println(error); 
                 String errorMsgString = "Socket connection error"; 
                 setErrorMessage(errorMsgString);
             }

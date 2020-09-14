@@ -50,6 +50,7 @@ public class ClientInterfaceController implements Initializable{
     @FXML private TextArea chat_area;
     @FXML private ScrollPane scroll_chat;
     @FXML private VBox chat_box;
+    @FXML private AnchorPane background;
 
     private Client client;
     private File file;
@@ -124,6 +125,22 @@ public class ClientInterfaceController implements Initializable{
         }
         hbox.getChildren().add(text);
         Platform.runLater(() -> chat_box.getChildren().add(hbox));
+    }
+    
+    //Upon clicking the logout button 
+    @FXML 
+    public void logout(MouseEvent e) throws IOException {
+        this.client.logout(); 
+        try {
+            Stage stage = (Stage) this.background.getScene().getWindow();
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/View/Client-Landing.fxml"));
+            Scene scene = new Scene(loader.load());
+            stage.setScene(scene); 
+        }
+        catch (Exception error) {
+            System.out.println(error); 
+        }
     }
 
     public void updateUIImage(boolean isSent, BufferedImage image){   
