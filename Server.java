@@ -1,6 +1,10 @@
 import java.net.*;
 import java.io.*;
 import java.util.ArrayList; 
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
+import java.nio.ByteBuffer;
+import javafx.stage.FileChooser;
 
 /*
 	ChatServer class 
@@ -96,6 +100,19 @@ public class Server
 		for (Connection c : this.clients) 
 			if (c.getSource().equals(recipient))
 				c.writeMessage(message); 
+	}
+
+	/*
+		Sends an Image to the specified recipient 
+		@param recipient The recipient of the message
+		@param image Image to send 
+	*/
+	public void sendMessage(String recipient, BufferedImage image) {
+		System.out.println("Sending " + image + " to " + recipient);
+		//Loop to find the recipient in the list
+		for (Connection c : this.clients) 
+			if (c.getSource().equals(recipient))
+				c.writeMessage(image); 
 	}
 
 	public static void main(String[] args) {
