@@ -100,7 +100,8 @@ public class Connection extends Thread {
         catch (IOException e) {
             System.out.println("Error in writing message to client."); 
         }
-      
+    }
+     
     /**
         Informs client that there is no recipient on the other end
     */

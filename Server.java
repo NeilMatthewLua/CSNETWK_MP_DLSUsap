@@ -34,6 +34,7 @@ public class Server
 			serverSocket = new ServerSocket(nPort);
 			boolean running = true; 
 			while(running) {
+				System.out.println(running); //Makes recon work lmao
 				//Accept clients until two 
 				if (clients.size() < 2) {
 					System.out.println("Server: Listening on port " + nPort + "...");
@@ -104,8 +105,8 @@ public class Server
 		String src1 = this.clients.get(0).getSource(); 
 		String src2 = this.clients.get(1).getSource();
 		//Set the source of a client as the destination of the other
-		this.clients.get(0).setDest(src1);
-		this.clients.get(1).setDest(src2); 
+		this.clients.get(0).setDest(src2);
+		this.clients.get(1).setDest(src1);
 		//Inform each client that a connection has been established
 		this.clients.get(0).informConnection(); 
 		this.clients.get(1).informConnection(); 
