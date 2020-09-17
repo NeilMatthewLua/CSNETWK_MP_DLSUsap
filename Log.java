@@ -18,7 +18,7 @@ public class Log {
     private Timestamp timeSent; 
 
     /* 
-        Constructor for type LOGIN, LOGOUT, DISCONNECT
+        Constructor for type LOGIN, LOGOUT, DISCONNECT, 
         @param source Client that performed the log 
         @param activityType Type of the activity that was logged
     */
@@ -26,6 +26,14 @@ public class Log {
         this.source = source; 
         this.activityType = activityType; 
         this.timeSent = new Timestamp(System.currentTimeMillis());
+    }
+
+    /*
+        Constructor for type FAILRECEIVEMSG, FAILSENDMSG, FAILRECEIVEFILE, FAILSENDFILE
+    */
+    public Log(String source, String activityType, boolean isSender) {
+        this(source, activityType);
+        this.isSender = isSender; 
     }
 
     /* 
@@ -42,7 +50,7 @@ public class Log {
     }
 
     /* 
-        Constructor for type FILE
+        Constructor for type MESSAGE
         @param source Client that performed the log 
         @param activityType Type of the activity that was logged
         @param dest Destination client of the activity 
@@ -68,6 +76,18 @@ public class Log {
         else if (this.activityType.equals("DISCONNECT")) {
             return "(" + this.timeSent + ")" + this.source + ": User disconnected";
         }
+        else if (this.activityType.equals("FAILSENDMSG")) {
+            return "(" + this.timeSent + ")" + this.source + ": Failed to send message.";
+        }
+        else if (this.activityType.equals("FAILRECEIVEMSG")) {
+            return "(" + this.timeSent + ")" + this.source + ": Failed to receive message.";
+        }
+        else if (this.activityType.equals("FAILSENDFILE")) {
+            return "(" + this.timeSent + ")" + this.source + ": Failed to send file.";
+        }
+        else if (this.activityType.equals("FAILRECEIVEFILE")) {
+            return "(" + this.timeSent + ")" + this.source + ": Failed to receive file.";
+        }
         else if (this.activityType.equals("FILE")) {
             if (this.isSender)
                 return "(" + this.timeSent + ")" + this.source + ": Sent a file to " + this.dest;  
@@ -81,7 +101,7 @@ public class Log {
                 return "(" + this.timeSent + ")" + this.source + ": Received a message from" + this.dest + " " + this.message ;
         }
         else {
-            return "Unknown activity type recorded."; 
+            return "Unknown activity type recorded." + this.activityType; 
         }
     }
 }

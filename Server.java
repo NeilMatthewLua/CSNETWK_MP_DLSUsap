@@ -14,12 +14,12 @@ import javafx.stage.FileChooser;
 public class Server
 {
 	private ArrayList<Connection> clients; 
-	private ArrayList<Log> logs;  
-
+	private LogList logs;  
+	private volatile boolean running = true;
 	//Server class constructor 
 	public Server() {
 		this.clients = new ArrayList<Connection>();
-		this.logs = new ArrayList<Log>();
+		this.logs = new LogList(); 
 	}
 	
 	/*
@@ -31,10 +31,8 @@ public class Server
 		Socket serverEndpoint;
 		try 
 		{
-			serverSocket = new ServerSocket(nPort);
-			boolean running = true; 
+			serverSocket = new ServerSocket(nPort); 
 			while(running) {
-				System.out.println(running); //Makes recon work lmao
 				//Accept clients until two 
 				if (clients.size() < 2) {
 					System.out.println("Server: Listening on port " + nPort + "...");
@@ -87,8 +85,7 @@ public class Server
 	*/
 	public void removeConnection(Connection src) {
 		String address = src.getDest(); 
-		this.clients.remove(src); 
-		System.out.println(clients.size()); 
+		this.clients.remove(src);  
 		for (Connection c : this.clients) 
 			if (c.getSource().equals(address)) {
 				//
