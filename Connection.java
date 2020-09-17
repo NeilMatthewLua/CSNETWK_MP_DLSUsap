@@ -68,13 +68,13 @@ public class Connection extends Thread {
         @param message Message to be sent 
     */
     public void writeMessage(String message) { 
-        this.server.addLog(new Log(this.source, "MESSAGE", this.dest, false, message)); 
+        this.server.addLog(new Log(this.source, "MESSAGE", this.dest, true, message)); 
         try {
             this.writer.writeUTF("MESSAGE");
             this.writer.writeUTF(message);
         }
         catch (IOException e) {
-            System.out.println("Error in writing message to client."); 
+            this.server.addLog(new Log(this.source, "FAILSENDMSG", true));
         }
     }
 
@@ -83,8 +83,7 @@ public class Connection extends Thread {
         @param message Message to be sent 
     */
     public void writeMessage(BufferedImage image) {
-        System.out.println("Received am image from other client"); 
-        // TODO this.server.addLog(new Log(this.source, "MESSAGE", this.dest, false, message)); 
+        this.server.addLog(new Log(this.source, "FILE", this.dest, true)); 
         try {
             // BufferedImage buffImage = ImageIO.read(new File(image.getPath()));
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -98,7 +97,7 @@ public class Connection extends Thread {
             writer.flush();
         }
         catch (IOException e) {
-            System.out.println("Error in writing message to client."); 
+            this.server.addLog(new Log(this.source, "FAILSENDFILE", true)); 
         }
     }
      
@@ -122,10 +121,10 @@ public class Connection extends Thread {
         try {
             this.writer.writeUTF("DISCONNECT");
             this.writer.writeUTF("Message from server: Client: " + this.dest + " has disconnected."); 
-            this.server.addLog(new Log(this.dest, "DISCONNECTED")); 
+            this.server.addLog(new Log(this.dest, "DISCONNECT")); 
         }
         catch (IOException e) {
-            System.out.println("Error in notifying client."); 
+            System.out.println("Error in notifying client of disconnection."); 
         }
     }
 
@@ -143,6 +142,19 @@ public class Connection extends Thread {
     }
 
     /*
+        Informs client that the server has been closed 
+    */
+    public void informServerClose() {
+        try {
+            this.writer.writeUTF("SERVER CLOSED"); 
+            this.writer.writeUTF("Message from server: Server closed.");
+        }
+        catch (IOException e) {
+            System.out.println("Error in notifying client."); 
+        }
+    }
+
+    /*
         Returns String-form of source and destination attributes
     */
     public String toString() {
@@ -152,7 +164,7 @@ public class Connection extends Thread {
     /*
         Performs I/O closing and server calls when connection is closed
     */
-    private void cleanup() {
+    public void cleanup() {
         this.server.addLog(new Log(this.source, "LOGOUT")); 
         this.server.removeConnection(this); 
         try {
@@ -173,10 +185,14 @@ public class Connection extends Thread {
             // Check what activity the user did
             while (!(msg = reader.readUTF()).equals("LOGOUT")) {
                 if (msg.equals("MESSAGE")) {
-                    msg = reader.readUTF();
-                    System.out.println("Received message from GUI: " + msg); 
-                    this.server.sendMessage(this.dest, msg); 
-                    this.server.addLog(new Log(this.source, "MESSAGE", this.dest, false, msg)); 
+                    try {
+                        msg = reader.readUTF();
+                        this.server.sendMessage(this.dest, msg); 
+                        this.server.addLog(new Log(this.source, "MESSAGE", this.dest, false, msg));
+                    } catch (IOException e) {
+                        //If user failed to receive message
+                        this.server.addLog(new Log(this.source, "FAILRECEIVEMSG", false));
+                    }
                 }
                 else if (msg.equals("FILE")) {
                     try {
@@ -197,18 +213,19 @@ public class Connection extends Thread {
                         }
                         BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageAr));
                         this.server.sendMessage(this.dest, image); 
+                        this.server.addLog(new Log(this.source, "FILE", this.dest, true));
                     } catch (IOException ex) {
-                        ex.printStackTrace();
+                        //Add in fail in sending 
+                        this.server.addLog(new Log(this.source, "FAILRECEIVEFILE", false));
                     }
-                }
+                } 
             }
             //Perform final cleanup before closing
-            this.cleanup(); 
+            this.cleanup();
         } catch (Exception e) {
-            e.printStackTrace(); // Uncomment this if you want to look at the error thrown
-        } finally {
-            System.out.println("Server: Client " + socket.getRemoteSocketAddress() + " has disconnected");
-        }
+            if (server.getRunning())
+                e.printStackTrace(); 
+        } 
     }
 
 }
