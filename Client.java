@@ -3,7 +3,6 @@ import java.net.*;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.nio.ByteBuffer;
-import javafx.stage.FileChooser;
 
 public class Client extends Thread{
 
@@ -68,7 +67,10 @@ public class Client extends Thread{
             this.dos.writeUTF("FILE");
             BufferedImage buffImage = ImageIO.read(new File(image.getPath()));
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            ImageIO.write(buffImage, "jpg", byteArrayOutputStream);
+            String[] arrOfStr = image.getPath().split("\\."); 
+            String file_type = arrOfStr[arrOfStr.length - 1];
+            this.dos.writeUTF(file_type);
+            ImageIO.write(buffImage, file_type, byteArrayOutputStream);
 
             byte[] size = ByteBuffer.allocate(4).putInt(byteArrayOutputStream.size()).array();
 
@@ -76,7 +78,7 @@ public class Client extends Thread{
             this.dos.write(size);
             this.dos.write(byteArrayOutputStream.toByteArray());
             dos.flush();
-            this.controller.updateUIImage(true, buffImage);
+            this.controller.updateUIImage(true, buffImage, file_type);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -97,9 +99,9 @@ public class Client extends Thread{
      * @param image Image of the sender 
      * @param file File object to path 
      */
-    public void saveImage(BufferedImage image, File file){
+    public void saveImage(BufferedImage image, File file, String file_type){
         try{
-            ImageIO.write(image, "jpg", new File(file.getPath() + ".jpg"));
+            ImageIO.write(image, file_type, new File(file.getPath() + "." + file_type));
         }
         catch(Exception e){
         }
@@ -136,6 +138,7 @@ public class Client extends Thread{
                 }
                 else if(message.equals("FILE")){ //Message is an image
                     try {
+                        String file_type = dis.readUTF();
                         byte[] sizeAr = new byte[4];
                         this.dis.read(sizeAr);
                         int size = ByteBuffer.wrap(sizeAr).asIntBuffer().get();
@@ -153,7 +156,7 @@ public class Client extends Thread{
                         }
                         BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageAr));
 
-                        this.controller.updateUIImage(false, image);
+                        this.controller.updateUIImage(false, image, file_type);
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
@@ -162,10 +165,23 @@ public class Client extends Thread{
                     this.controller.toggleChat(false, "Waiting for other client");
                 }
                 else if (message.equals("CONNECTION ESTABLISHED")){
+                    this.controller.updateUIMessage(false, "Other client is connected.");
                     this.controller.toggleChat(true,"");
                 }
                 else if (message.equals("DISCONNECT")){
                     this.controller.toggleChat(false, "Other client Disconnected");
+                }
+                else if (message.equals("FAILSENDMSG")){
+                    this.controller.updateUIErrorMessage(true, "Failed to send message");
+                }
+                else if (message.equals("FAILSENDFILE")){
+                    this.controller.updateUIErrorMessage(true, "Failed to send file");
+                }
+                else if (message.equals("FAILRECEIVEMSG")){
+                    this.controller.updateUIErrorMessage(false, "Failed to receive message");
+                }
+                else if (message.equals("FAILRECEIVEFILE")){
+                    this.controller.updateUIErrorMessage(false, "Failed to receive file");
                 }
             }
             catch(Exception e){

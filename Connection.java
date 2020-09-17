@@ -82,16 +82,17 @@ public class Connection extends Thread {
         Sends an image to the client using this connection 
         @param message Message to be sent 
     */
-    public void writeMessage(BufferedImage image) {
+    public void writeMessage(BufferedImage image, String file_type) {
         this.server.addLog(new Log(this.source, "FILE", this.dest, true)); 
         try {
             // BufferedImage buffImage = ImageIO.read(new File(image.getPath()));
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            ImageIO.write(image, "jpg", byteArrayOutputStream);
+            ImageIO.write(image, file_type, byteArrayOutputStream);
 
             byte[] size = ByteBuffer.allocate(4).putInt(byteArrayOutputStream.size()).array();
             // write on the output stream
             this.writer.writeUTF("FILE");
+            this.writer.writeUTF(file_type);
             this.writer.write(size);
             this.writer.write(byteArrayOutputStream.toByteArray());
             writer.flush();
@@ -196,6 +197,7 @@ public class Connection extends Thread {
                 }
                 else if (msg.equals("FILE")) {
                     try {
+                        String file_type = reader.readUTF();
                         byte[] sizeAr = new byte[4];
                         this.reader.read(sizeAr);
                         int size = ByteBuffer.wrap(sizeAr).asIntBuffer().get();
@@ -212,8 +214,8 @@ public class Connection extends Thread {
                             e.printStackTrace();
                         }
                         BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageAr));
-                        this.server.sendMessage(this.dest, image); 
-                        this.server.addLog(new Log(this.source, "FILE", this.dest, true));
+                        this.server.sendMessage(this.dest, image, file_type); 
+                        this.server.addLog(new Log(this.source, "FILE", this.dest, false));
                     } catch (IOException ex) {
                         //Add in fail in sending 
                         this.server.addLog(new Log(this.source, "FAILRECEIVEFILE", false));
