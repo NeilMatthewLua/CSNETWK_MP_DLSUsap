@@ -1,11 +1,12 @@
 import java.net.*;
 import java.io.*;
 import java.util.ArrayList; 
+import java.util.Scanner; 
+import java.util.concurrent.atomic.AtomicBoolean; 
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.nio.ByteBuffer;
 import javafx.stage.FileChooser;
-
 /*
 	ChatServer class 
 	@attribute clients List of connections handled by the server
@@ -14,11 +15,17 @@ import javafx.stage.FileChooser;
 public class Server
 {
 	private ArrayList<Connection> clients; 
+	private ArrayList<Thread> clientListeners; 
 	private LogList logs;  
-	private volatile boolean running = true;
+	Scanner scan;
+	private AtomicBoolean running = new AtomicBoolean(true);
+	//isServerPrompt to ensure only one server close prompt is asked 
+	private AtomicBoolean isServerPromptActive = new AtomicBoolean(true); 
 	//Server class constructor 
 	public Server() {
+		scan = new Scanner(System.in);
 		this.clients = new ArrayList<Connection>();
+		this.clientListeners = new ArrayList<Thread>(); 
 		this.logs = new LogList(); 
 	}
 	
@@ -26,49 +33,54 @@ public class Server
 		Starts the server and listens on the port provided. Loops until both clients have disconnected.
 		@param nPort Port number the server will use 
 	*/
-	public void start(int nPort) {
-		ServerSocket serverSocket;
-		Socket serverEndpoint;
+	public void start(int nPort, Server s) {
+		final ServerSocket serverSocket;
 		try 
 		{
 			serverSocket = new ServerSocket(nPort); 
-			while(running) {
-				//Accept clients until two 
-				if (clients.size() < 2) {
-					System.out.println("Server: Listening on port " + nPort + "...");
-					serverEndpoint = serverSocket.accept();
-					String clientAddress = serverEndpoint.getRemoteSocketAddress().toString();
-					System.out.println("Server: New client connected: " + clientAddress);
-					logs.add(new Log(clientAddress, "LOGIN"));
-
-					//Add client to the pool of threads
-					Connection client = new Connection(serverEndpoint, clientAddress, this); 
-					clients.add(client); 
-					client.start();
-					
-					if (clients.size() == 2) 
-						this.connectClients(); 
-					else 
-						client.informNoRecipient(); 
-				}	
-			}
-			
-			//Close IO streams when closing the server 
+			System.out.println("Server: Listening on port " + nPort + "...");
+			while(this.running.get()) {
+				if (clientListeners.size() < 2) {
+					Thread acceptClient = new Thread("Listen to client") {
+						public void run() {
+							try {
+								Socket serverEndpoint = serverSocket.accept();
+								String clientAddress = serverEndpoint.getRemoteSocketAddress().toString();
+								System.out.println("Server: New client connected: " + clientAddress);
+								logs.add(new Log(clientAddress, "LOGIN"));
+	
+								//Add client to the pool of threads
+								Connection client = new Connection(serverEndpoint, clientAddress, s); 
+								s.clients.add(client); 
+								client.start();
+								if (clients.size() == 2) 
+									s.connectClients(); 
+								else 
+									client.informNoRecipient();
+							} catch(IOException e) {
+								if (s.running.get())
+									System.out.println("Error in accepting client."); 
+							}
+						}
+					};  
+					acceptClient.start(); 
+					clientListeners.add(acceptClient); 
+				}
+				 
+			} 
+			//Close server 
 			try {
 				serverSocket.close();
+				System.out.println("Server closed."); 
 			}
 			catch(Exception e) {
-				System.out.println("Exception closing the server and clients: " + e);
+				System.out.println("Exception closing the server " + e);
 			}
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
-		}
-		finally
-		{
-			System.out.println("Server: Connection is terminated.");
-		}
+		} 
 	}
 
 	/*
@@ -79,11 +91,21 @@ public class Server
 		this.logs.add(l); 
 	}
 
+	public boolean getRunning() {
+		return this.running.get(); 
+	}
+
 	/*
 		Removes specified object from client list and informs other client of disconnect 
 		@param src Connection object to be removed
 	*/
 	public void removeConnection(Connection src) {
+		//Remove a client listener to free up a space for another listener 
+		int index = this.clientListeners.size()-1; 
+		this.clientListeners.get(index); 
+		this.clientListeners.remove(index); 
+		
+		//Remove the connection 
 		String address = src.getDest(); 
 		this.clients.remove(src);  
 		for (Connection c : this.clients) 
@@ -93,7 +115,49 @@ public class Server
 				//Remove dest address from the other client
 				c.setDest(null); 
 			}
+		//Ask user if they want to close the server 
+		this.promptServerClose(); 
 	} 
+
+	/**
+	 * Function to prompt user to close server and save logs 
+	 */
+	public void promptServerClose() {
+		//If server is still running and if no server prompt has been initiated 
+		if (this.getRunning() && isServerPromptActive.get()) {
+			isServerPromptActive.set(false);  
+			//Ask the user if they want to save the logs 
+			System.out.println("Do you wish to close the server? (Y/N)"); 
+			String choiceClose = this.scan.nextLine();
+			//Close the server
+			if (choiceClose.equals("Y")) {
+				//Stop accepting logs 
+				this.logs.setAccepting(false); 
+				//Ask user if they want to save the logs 
+				System.out.println("Do you wish to save the logs? (Y/N)"); 
+				String choiceSave = this.scan.nextLine(); 
+				if (choiceSave.equals("Y")) 
+					this.logs.saveLogs();
+
+				//Stop accepting client listeners
+				this.running.set(false);
+				//Close all client listeners 
+				for (Thread t : clientListeners) {
+					t.interrupt(); 
+				}
+				//Close all client connections 
+				for (Connection c : clients) {
+					c.informServerClose(); 
+					c.cleanup(); 
+					c.interrupt();  
+				}
+			}
+			else {
+				System.out.println("Server will continue running."); 
+			}
+		}
+		isServerPromptActive.set(true); 
+	}	
 
 	/*
 		Adds each client as the destination of the other
@@ -142,6 +206,6 @@ public class Server
 		else 
 			nPort = 4000; 
 		Server s = new Server(); 
-		s.start(nPort); 
+		s.start(nPort, s); 
 	}
 }

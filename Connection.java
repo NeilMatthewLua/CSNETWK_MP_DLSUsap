@@ -142,6 +142,19 @@ public class Connection extends Thread {
     }
 
     /*
+        Informs client that the server has been closed 
+    */
+    public void informServerClose() {
+        try {
+            this.writer.writeUTF("SERVER CLOSED"); 
+            this.writer.writeUTF("Message from server: Server closed.");
+        }
+        catch (IOException e) {
+            System.out.println("Error in notifying client."); 
+        }
+    }
+
+    /*
         Returns String-form of source and destination attributes
     */
     public String toString() {
@@ -151,7 +164,7 @@ public class Connection extends Thread {
     /*
         Performs I/O closing and server calls when connection is closed
     */
-    private void cleanup() {
+    public void cleanup() {
         this.server.addLog(new Log(this.source, "LOGOUT")); 
         this.server.removeConnection(this); 
         try {
@@ -205,15 +218,14 @@ public class Connection extends Thread {
                         //Add in fail in sending 
                         this.server.addLog(new Log(this.source, "FAILRECEIVEFILE", false));
                     }
-                }
+                } 
             }
             //Perform final cleanup before closing
-            this.cleanup(); 
+            this.cleanup();
         } catch (Exception e) {
-            e.printStackTrace(); // Uncomment this if you want to look at the error thrown
-        } finally {
-            System.out.println("Server: Client " + socket.getRemoteSocketAddress() + " has disconnected");
-        }
+            if (server.getRunning())
+                e.printStackTrace(); 
+        } 
     }
 
 }
