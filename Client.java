@@ -115,6 +115,9 @@ public class Client extends Thread{
             // write on the output stream
             this.dos.writeUTF("LOGOUT");
             this.running = false; 
+            this.dis.close();
+            this.dos.close();
+            this.s.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -125,7 +128,9 @@ public class Client extends Thread{
         while(this.running){
             try{
                 //Receives the heads up first from the server to know what kind of message will be received
-                String message = dis.readUTF();
+                String message = "";
+                if(dis.available() > 0)
+                    message = dis.readUTF();
                 //If message is a chat 
                 if(message.equals("MESSAGE")){
                     try{

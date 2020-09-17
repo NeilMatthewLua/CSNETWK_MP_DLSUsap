@@ -135,6 +135,9 @@ public class ClientInterfaceController implements Initializable{
             loader.setLocation(getClass().getResource("/View/Client-Landing.fxml"));
             Scene scene = new Scene(loader.load());
             stage.setScene(scene); 
+            stage.setOnHiding(event -> {
+                System.out.println("Closing Stage");
+            });
         }
         catch (Exception error) {
             System.out.println(error); 
