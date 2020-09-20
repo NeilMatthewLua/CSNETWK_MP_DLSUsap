@@ -106,6 +106,14 @@ public class Client extends Thread{
         catch(Exception e){
         }
     }
+
+    public boolean getRunning(){
+        return this.running;
+    }
+
+    public void setRunning(boolean isRunning){
+        this.running = isRunning;
+    }
     
     /**     
      * Sends a signal to the server that the user will logout and closes the thread 

@@ -40,6 +40,7 @@ import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.nio.ByteBuffer;
 import javafx.stage.FileChooser;
+import static javafx.stage.Modality.APPLICATION_MODAL;
 
 public class ClientInterfaceController implements Initializable{
 
@@ -56,7 +57,7 @@ public class ClientInterfaceController implements Initializable{
 
     private Client client;
     private File file;
-
+    
     @Override
     public void initialize(URL url, ResourceBundle rb){
         chat_area.setWrapText(true);
@@ -128,22 +129,45 @@ public class ClientInterfaceController implements Initializable{
     //Upon clicking the logout button 
     @FXML 
     public void logout(MouseEvent e) throws IOException {
-        this.client.logout(); 
-        try {
-            Stage stage = (Stage) this.background.getScene().getWindow();
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("/View/Client-Landing.fxml"));
-            Scene scene = new Scene(loader.load());
-            stage.setScene(scene); 
-            stage.setOnHiding(event -> {
-                System.out.println("Closing Stage");
-            });
-        }
-        catch (Exception error) {
-            System.out.println(error); 
-        }
+        this.logout_client();
     }
 
+    public void logout_client(){
+        try{
+            Stage stage = new Stage();
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/View/Confirm-Exit.fxml"));
+            Scene scene = new Scene(loader.load(),575,575);
+            stage.setScene(scene);
+            stage.setResizable(false);
+            stage.initModality(APPLICATION_MODAL);
+           ((ConfirmExitController) loader.getController()).setClient(this.client);
+            stage.setX(350);
+            stage.setY(30);
+            stage.showAndWait();
+   
+            if(this.client.getRunning() == false){
+                this.client.logout(); 
+                try {
+                    Stage stage_2 = (Stage) this.background.getScene().getWindow();
+                    FXMLLoader loader_2 = new FXMLLoader();
+                    loader_2.setLocation(getClass().getResource("/View/Client-Landing.fxml"));
+                    Scene scene_2 = new Scene(loader_2.load());
+                    stage_2.setScene(scene_2); 
+                    stage_2.setOnCloseRequest(event -> {
+                        stage_2.close();
+                    });
+                }
+                catch (Exception error) {
+                    System.out.println(error); 
+                }
+            }
+          }
+          catch(IOException event){
+            System.out.println("Error");
+          }
+    }
+    
     @FXML
     public void updateUIImage(boolean isSent, BufferedImage image, String file_type){   
         // create a Button 

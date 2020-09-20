@@ -27,8 +27,6 @@ public class ClientLandingController {
         if (!isEmptyFields()) {
             String ipAddressVal = ipAddress.getText().trim(); 
             String portNumberVal = portNumber.getText().trim();
-            // System.out.println(ipAddressVal);
-            // System.out.println(portNumberVal);
             try{
                 Socket s = new Socket(ipAddressVal, Integer.parseInt(portNumberVal));
                 client = new Client(s);
@@ -37,11 +35,11 @@ public class ClientLandingController {
                 loader.setLocation(getClass().getResource("/View/Client-Interface.fxml"));
                 Scene scene = new Scene(loader.load());
                 stage.setScene(scene);
-                //Close stage handler to logout user on stage close
-                stage.setOnHiding(event -> {
-                    System.out.println("Closing Stage");
-                    this.client.logout(); 
-                });
+                stage.setOnCloseRequest(winevent -> {
+                    ((ClientInterfaceController) loader.getController()).logout_client(); 
+                      winevent.consume();
+                  });
+
                 ((ClientInterfaceController) loader.getController()).setClient(client); 
                 client.start();
             }
