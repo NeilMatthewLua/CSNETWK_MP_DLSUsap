@@ -77,11 +77,11 @@ public class ClientInterfaceController implements Initializable{
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Resource File");
         fileChooser.getExtensionFilters().addAll(
-                new ExtensionFilter("Image Files", "*.png", "*.jpg"));
+                new ExtensionFilter("Files", "*.png", "*.jpg", "*.txt"));
         File selectedFile = fileChooser.showOpenDialog(null);
-        System.out.println("HERE " + selectedFile);
+
         if (selectedFile != null){
-            file_label.setText("Image attached: " + selectedFile.getPath());
+            file_label.setText("File attached: " + selectedFile.getPath());
             this.file = selectedFile;
         }
     }
@@ -197,6 +197,49 @@ public class ClientInterfaceController implements Initializable{
         
         if(isSent){
             Text text=new Text("You sent an image");
+    
+            text.setFill(Color.BLACK);
+            hbox.setAlignment(Pos.BOTTOM_RIGHT);
+            hbox.getChildren().add(text);
+        }else{
+            chat_box.setAlignment(Pos.TOP_LEFT);
+            hbox.setAlignment(Pos.CENTER_LEFT);
+            hbox.getChildren().add(save_button);
+        }
+        this.file = null;
+        Platform.runLater(() -> chat_box.getChildren().add(hbox));
+    }
+
+    @FXML
+    public void updateUIText(boolean isSent, String message, String file_type){ 
+        System.out.println("CONTROLLER ME");  
+        // create a Button 
+        Button save_button = new Button("Download Text File"); 
+  
+        // create an Event Handler 
+        EventHandler<ActionEvent> event1 =  
+         new EventHandler<ActionEvent>() { 
+  
+            public void handle(ActionEvent e) 
+            { 
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("Save Image");
+                
+                File file = fileChooser.showSaveDialog(null);
+  
+                if (file != null) { 
+                    client.saveText(message, file, file_type);
+                } 
+            } 
+        }; 
+        System.out.println("AFTER CONTROLLER ME");
+        save_button.setOnAction(event1); 
+        
+        HBox hbox=new HBox(12);
+        hbox.setPadding(new Insets(15, 12, 15, 12));
+        
+        if(isSent){
+            Text text=new Text("You sent a text file");
     
             text.setFill(Color.BLACK);
             hbox.setAlignment(Pos.BOTTOM_RIGHT);

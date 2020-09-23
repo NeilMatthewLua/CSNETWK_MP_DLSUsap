@@ -101,6 +101,23 @@ public class Connection extends Thread {
             this.server.addLog(new Log(this.source, "FAILSENDFILE", true)); 
         }
     }
+
+    /*
+        Sends an image to the client using this connection 
+        @param message Message to be sent 
+    */
+    public void writeMessage(String message, String file_type) {
+        this.server.addLog(new Log(this.source, "FILE", this.dest, true)); 
+        try {
+            // write on the output stream
+            this.writer.writeUTF("FILE");
+            this.writer.writeUTF(file_type);
+            this.writer.writeUTF(message);
+        }
+        catch (IOException e) {
+            this.server.addLog(new Log(this.source, "FAILSENDFILE", true)); 
+        }
+    }
      
     /**
         Informs client that there is no recipient on the other end
@@ -198,23 +215,30 @@ public class Connection extends Thread {
                 else if (msg.equals("FILE")) {
                     try {
                         String file_type = reader.readUTF();
-                        byte[] sizeAr = new byte[4];
-                        this.reader.read(sizeAr);
-                        int size = ByteBuffer.wrap(sizeAr).asIntBuffer().get();
-
-                        byte[] imageAr = new byte[size];
-                        int read = 0;
-                        try{
-                            while(read < size)
-                            {
-                                read += this.reader.read(imageAr,read,size-read); 
+                        if(file_type.equals("txt")){
+                            String message = this.reader.readUTF();
+                            this.server.sendMessage(this.dest, message, file_type); 
+                        }
+                        else{
+                            byte[] sizeAr = new byte[4];
+                            this.reader.read(sizeAr);
+                            int size = ByteBuffer.wrap(sizeAr).asIntBuffer().get();
+    
+                            byte[] imageAr = new byte[size];
+                            int read = 0;
+                            try{
+                                while(read < size)
+                                {
+                                    read += this.reader.read(imageAr,read,size-read); 
+                                }
                             }
+                            catch (EOFException e){
+                                e.printStackTrace();
+                            }
+                            BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageAr));
+                            this.server.sendMessage(this.dest, image, file_type); 
                         }
-                        catch (EOFException e){
-                            e.printStackTrace();
-                        }
-                        BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageAr));
-                        this.server.sendMessage(this.dest, image, file_type); 
+
                         this.server.addLog(new Log(this.source, "FILE", this.dest, false));
                     } catch (IOException ex) {
                         //Add in fail in sending 

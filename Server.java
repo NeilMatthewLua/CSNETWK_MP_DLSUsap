@@ -39,6 +39,7 @@ public class Server
 		{
 			serverSocket = new ServerSocket(nPort); 
 			System.out.println("Server: Listening on port " + nPort + "...");
+			System.out.println("Server address:" + serverSocket.getInetAddress());
 			while(this.running.get()) {
 				if (clientListeners.size() < 2) {
 					Thread acceptClient = new Thread("Listen to client") {
@@ -197,6 +198,19 @@ public class Server
 		for (Connection c : this.clients) 
 			if (c.getSource().equals(recipient))
 				c.writeMessage(image, file_type); 
+	
+			}
+	/*
+		Sends an Text File to the specified recipient 
+		@param recipient The recipient of the message
+		@param message TextFile to send 
+	*/
+	public void sendMessage(String recipient, String message, String file_type) {
+		System.out.println("Sending text file to " + recipient);
+		//Loop to find the recipient in the list
+		for (Connection c : this.clients) 
+			if (c.getSource().equals(recipient))
+				c.writeMessage(message, file_type); 
 	}
 
 	public static void main(String[] args) {
