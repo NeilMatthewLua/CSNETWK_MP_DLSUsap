@@ -40,6 +40,7 @@ import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.nio.ByteBuffer;
 import javafx.stage.FileChooser;
+import static javafx.stage.Modality.APPLICATION_MODAL;
 
 public class ClientInterfaceController implements Initializable{
 
@@ -56,7 +57,7 @@ public class ClientInterfaceController implements Initializable{
 
     private Client client;
     private File file;
-
+    
     @Override
     public void initialize(URL url, ResourceBundle rb){
         chat_area.setWrapText(true);
@@ -76,10 +77,13 @@ public class ClientInterfaceController implements Initializable{
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Resource File");
         fileChooser.getExtensionFilters().addAll(
-                new ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif"));
+                new ExtensionFilter("Image Files", "*.png", "*.jpg"));
         File selectedFile = fileChooser.showOpenDialog(null);
-        file_label.setText("Image attached: " + selectedFile.getPath());
-        this.file = selectedFile;
+        System.out.println("HERE " + selectedFile);
+        if (selectedFile != null){
+            file_label.setText("Image attached: " + selectedFile.getPath());
+            this.file = selectedFile;
+        }
     }
 
     //Upon clicking the send button
@@ -106,47 +110,66 @@ public class ClientInterfaceController implements Initializable{
         }
     }
     
+    @FXML
     public void updateUIMessage(boolean isSent, String strMessage){   
         Text text=new Text(strMessage);
 
         text.setFill(Color.BLACK);
-        // text.getStyleClass().add("message");
+        this.attachtoUI(isSent, text);
+    }
 
-        HBox hbox=new HBox(12);
-        hbox.setPadding(new Insets(15, 12, 15, 12));
+    @FXML
+    public void updateUIErrorMessage(boolean isSent, String strMessage){   
+        Text text=new Text(strMessage);
 
-        if(isSent){
-            // tempFlow.getStyleClass().add("tempFlow");
-            // flow.getStyleClass().add("textFlow");
-            hbox.setAlignment(Pos.BOTTOM_RIGHT);
-        }else{
-            // tempFlow.getStyleClass().add("tempFlowFlipped");
-            // flow.getStyleClass().add("textFlowFlipped");
-            chat_box.setAlignment(Pos.TOP_LEFT);
-            hbox.setAlignment(Pos.CENTER_LEFT);
-        }
-        hbox.getChildren().add(text);
-        Platform.runLater(() -> chat_box.getChildren().add(hbox));
+        text.setFill(Color.RED);
+        this.attachtoUI(isSent, text);
     }
     
     //Upon clicking the logout button 
     @FXML 
     public void logout(MouseEvent e) throws IOException {
-        this.client.logout(); 
-        try {
-            Stage stage = (Stage) this.background.getScene().getWindow();
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("/View/Client-Landing.fxml"));
-            Scene scene = new Scene(loader.load());
-            stage.setScene(scene); 
-        }
-        catch (Exception error) {
-            System.out.println(error); 
-        }
+        this.logout_client();
     }
 
+    public void logout_client(){
+        try{
+            Stage stage = new Stage();
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/View/Confirm-Exit.fxml"));
+            Scene scene = new Scene(loader.load(),575,575);
+            stage.setScene(scene);
+            stage.setResizable(false);
+            stage.initModality(APPLICATION_MODAL);
+           ((ConfirmExitController) loader.getController()).setClient(this.client);
+            stage.setX(350);
+            stage.setY(30);
+            stage.showAndWait();
+   
+            if(this.client.getRunning() == false){
+                this.client.logout(); 
+                try {
+                    Stage stage_2 = (Stage) this.background.getScene().getWindow();
+                    FXMLLoader loader_2 = new FXMLLoader();
+                    loader_2.setLocation(getClass().getResource("/View/Client-Landing.fxml"));
+                    Scene scene_2 = new Scene(loader_2.load());
+                    stage_2.setScene(scene_2); 
+                    stage_2.setOnCloseRequest(event -> {
+                        stage_2.close();
+                    });
+                }
+                catch (Exception error) {
+                    System.out.println(error); 
+                }
+            }
+          }
+          catch(IOException event){
+            System.out.println("Error");
+          }
+    }
+    
     @FXML
-    public void updateUIImage(boolean isSent, BufferedImage image){   
+    public void updateUIImage(boolean isSent, BufferedImage image, String file_type){   
         // create a Button 
         Button save_button = new Button("Download Image"); 
   
@@ -162,7 +185,7 @@ public class ClientInterfaceController implements Initializable{
                 File file = fileChooser.showSaveDialog(null);
   
                 if (file != null) { 
-                    client.saveImage(image, file);
+                    client.saveImage(image, file, file_type);
                 } 
             } 
         }; 
@@ -176,19 +199,29 @@ public class ClientInterfaceController implements Initializable{
             Text text=new Text("You sent an image");
     
             text.setFill(Color.BLACK);
-            // text.getStyleClass().add("message");
-            // tempFlow.getStyleClass().add("tempFlow");
-            // flow.getStyleClass().add("textFlow");
             hbox.setAlignment(Pos.BOTTOM_RIGHT);
             hbox.getChildren().add(text);
         }else{
-            // tempFlow.getStyleClass().add("tempFlowFlipped");
-            // flow.getStyleClass().add("textFlowFlipped");
             chat_box.setAlignment(Pos.TOP_LEFT);
             hbox.setAlignment(Pos.CENTER_LEFT);
             hbox.getChildren().add(save_button);
         }
         this.file = null;
+        Platform.runLater(() -> chat_box.getChildren().add(hbox));
+    }
+
+    @FXML
+    public void attachtoUI(boolean isSent, Text text){  
+        HBox hbox=new HBox(12);
+        hbox.setPadding(new Insets(15, 12, 15, 12));
+
+        if(isSent){
+            hbox.setAlignment(Pos.BOTTOM_RIGHT);
+        }else{
+            chat_box.setAlignment(Pos.TOP_LEFT);
+            hbox.setAlignment(Pos.CENTER_LEFT);
+        }
+        hbox.getChildren().add(text);
         Platform.runLater(() -> chat_box.getChildren().add(hbox));
     }
 

@@ -155,8 +155,8 @@ public class Server
 			else {
 				System.out.println("Server will continue running."); 
 			}
+			isServerPromptActive.set(true); 
 		}
-		isServerPromptActive.set(true); 
 	}	
 
 	/*
@@ -191,12 +191,12 @@ public class Server
 		@param recipient The recipient of the message
 		@param image Image to send 
 	*/
-	public void sendMessage(String recipient, BufferedImage image) {
+	public void sendMessage(String recipient, BufferedImage image, String file_type) {
 		System.out.println("Sending " + image + " to " + recipient);
 		//Loop to find the recipient in the list
 		for (Connection c : this.clients) 
 			if (c.getSource().equals(recipient))
-				c.writeMessage(image); 
+				c.writeMessage(image, file_type); 
 	}
 
 	public static void main(String[] args) {
