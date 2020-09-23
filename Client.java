@@ -69,41 +69,16 @@ public class Client extends Thread{
             String file_type = arrOfStr[arrOfStr.length - 1];
             if(file_type.equals("txt")){
                 this.dos.writeUTF(file_type);
-                // FileInputStream fis = new FileInputStream(file);
-                // // Holder of the size of the file
-                // byte[] contents;
-                // long fileLength = file.length(); 
-                // long current = 0;
-                
-                // int size = 10000;
-                // //Calculate the size of the file
-                // while(current != fileLength){ 
-                //     if(fileLength - current >= size)
-                //         current += size;    
-                //     else{ 
-                //         size = (int)(fileLength - current); 
-                //         current = fileLength;
-                //     } 
-                // } 
-
-                // contents = new byte[size]; 
-                // //Read the file from 0 to the last byte of the file, place it in contents
-                // fis.read(contents, 0, size); 
-                // this.dos.write(contents);
-                // this.dos.flush();
   
                 BufferedReader br = new BufferedReader(new FileReader(file.getPath())); 
   
-                String st = ""; 
+                String st;
+                String message = ""; 
                 while ((st = br.readLine()) != null){
-                //   System.out.println(st); 
-                  st += st;
-                } 
-                System.out.println(st);
-                this.dos.writeUTF(st);
-                System.out.println("BEFORE ME");
+                    message = message + st + "\n";
+                }
+                this.dos.writeUTF(message);
                 this.controller.updateUIText(true, st, file_type);
-                System.out.println("BACK ME");
             }
             else{
                 BufferedImage buffImage = ImageIO.read(new File(file.getPath()));
@@ -154,7 +129,7 @@ public class Client extends Thread{
      */
     public void saveText(String message, File file, String file_type){
         try {
-            FileWriter myWriter = new FileWriter(file.getPath());
+            FileWriter myWriter = new FileWriter(file.getPath() + ".txt");
             myWriter.write(message);
             myWriter.close();
           } catch (IOException e) {
@@ -208,23 +183,8 @@ public class Client extends Thread{
                 else if(message.equals("FILE")){ //Message is an image
                     String file_type = dis.readUTF();
                     if(file_type.equals("txt")){
-                        System.out.println("They sent me a file??");
                         String text = dis.readUTF();
                         this.controller.updateUIText(false, text, file_type);
-                        // //Since file size is unknown, set random integer size
-                        // byte[] contents = new byte[10000];
-                    
-                        // //Initialize FileOutputStream for the file name
-                        // FileOutputStream fos = new FileOutputStream("Received.txt");
-                        
-                        // //Hold the total number of bytes read
-                        // int bytesRead = 0; 
-                        
-                        // //While there's still content to be read, continue to write inside the file
-                        // while((bytesRead = disReader.read(contents))!=-1)
-                        //     fos.write(contents, 0, bytesRead); 
-
-                        // fos.flush(); 
                     }
                     else{
                         try {

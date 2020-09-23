@@ -216,21 +216,8 @@ public class Connection extends Thread {
                     try {
                         String file_type = reader.readUTF();
                         if(file_type.equals("txt")){
-                            // //Since file size is unknown, set random integer size
-                            // byte[] contents = new byte[10000];
-                            
-                            // //Hold the total number of bytes read
-                            // int bytesRead = 0; 
-                            
-                            // //While there's still content to be read, continue to write inside the file
-                            // while((bytesRead = this.reader.read(contents))!=-1){
-                            //     System.out.print((char) bytesRead); 
-                            // }
-                                
-                            // this.writer.flush();
                             String message = this.reader.readUTF();
-                            System.out.println("Server here, I got: " + message);
-                            this.server.sendMessage(this.dest, msg, file_type); 
+                            this.server.sendMessage(this.dest, message, file_type); 
                         }
                         else{
                             byte[] sizeAr = new byte[4];
