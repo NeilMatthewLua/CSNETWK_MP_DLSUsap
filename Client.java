@@ -62,23 +62,63 @@ public class Client extends Thread{
      * Sends an image the server towards to the other client
      * @param image Image of the sender 
      */
-    public void sendMessage(File image) throws UnknownHostException, IOException{
+    public void sendMessage(File file) throws UnknownHostException, IOException{
         try {
             this.dos.writeUTF("FILE");
-            BufferedImage buffImage = ImageIO.read(new File(image.getPath()));
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            String[] arrOfStr = image.getPath().split("\\."); 
+            String[] arrOfStr = file.getPath().split("\\."); 
             String file_type = arrOfStr[arrOfStr.length - 1];
-            this.dos.writeUTF(file_type);
-            ImageIO.write(buffImage, file_type, byteArrayOutputStream);
+            if(file_type.equals("txt")){
+                this.dos.writeUTF(file_type);
+                // FileInputStream fis = new FileInputStream(file);
+                // // Holder of the size of the file
+                // byte[] contents;
+                // long fileLength = file.length(); 
+                // long current = 0;
+                
+                // int size = 10000;
+                // //Calculate the size of the file
+                // while(current != fileLength){ 
+                //     if(fileLength - current >= size)
+                //         current += size;    
+                //     else{ 
+                //         size = (int)(fileLength - current); 
+                //         current = fileLength;
+                //     } 
+                // } 
 
-            byte[] size = ByteBuffer.allocate(4).putInt(byteArrayOutputStream.size()).array();
+                // contents = new byte[size]; 
+                // //Read the file from 0 to the last byte of the file, place it in contents
+                // fis.read(contents, 0, size); 
+                // this.dos.write(contents);
+                // this.dos.flush();
+  
+                BufferedReader br = new BufferedReader(new FileReader(file.getPath())); 
+  
+                String st = ""; 
+                while ((st = br.readLine()) != null){
+                //   System.out.println(st); 
+                  st += st;
+                } 
+                System.out.println(st);
+                this.dos.writeUTF(st);
+                System.out.println("BEFORE ME");
+                this.controller.updateUIText(true, st, file_type);
+                System.out.println("BACK ME");
+            }
+            else{
+                BufferedImage buffImage = ImageIO.read(new File(file.getPath()));
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                this.dos.writeUTF(file_type);
+                ImageIO.write(buffImage, file_type, byteArrayOutputStream);
 
-            // write on the output stream
-            this.dos.write(size);
-            this.dos.write(byteArrayOutputStream.toByteArray());
-            dos.flush();
-            this.controller.updateUIImage(true, buffImage, file_type);
+                byte[] size = ByteBuffer.allocate(4).putInt(byteArrayOutputStream.size()).array();
+
+                // write on the output stream
+                this.dos.write(size);
+                this.dos.write(byteArrayOutputStream.toByteArray());
+                this.dos.flush();
+                this.controller.updateUIImage(true, buffImage, file_type);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -87,11 +127,11 @@ public class Client extends Thread{
     /**
      * Sends a message and image the server towards to the other client
      * @param strMessage Message of the sender 
-     * @param image Image of the sender 
+     * @param file File of the sender 
      */
-    public void sendMessage(String strMessage, File image) throws UnknownHostException, IOException{
+    public void sendMessage(String strMessage, File file) throws UnknownHostException, IOException{
         this.sendMessage(strMessage);
-        this.sendMessage(image);
+        this.sendMessage(file);
     }
 
     /**
@@ -105,6 +145,22 @@ public class Client extends Thread{
         }
         catch(Exception e){
         }
+    }
+
+    /**
+     * Saves an image to the local machine
+     * @param image Image of the sender 
+     * @param file File object to path 
+     */
+    public void saveText(String message, File file, String file_type){
+        try {
+            FileWriter myWriter = new FileWriter(file.getPath());
+            myWriter.write(message);
+            myWriter.close();
+          } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+          }
     }
 
     public boolean getRunning(){
@@ -150,28 +206,49 @@ public class Client extends Thread{
                     }
                 }
                 else if(message.equals("FILE")){ //Message is an image
-                    try {
-                        String file_type = dis.readUTF();
-                        byte[] sizeAr = new byte[4];
-                        this.dis.read(sizeAr);
-                        int size = ByteBuffer.wrap(sizeAr).asIntBuffer().get();
+                    String file_type = dis.readUTF();
+                    if(file_type.equals("txt")){
+                        System.out.println("They sent me a file??");
+                        String text = dis.readUTF();
+                        this.controller.updateUIText(false, text, file_type);
+                        // //Since file size is unknown, set random integer size
+                        // byte[] contents = new byte[10000];
+                    
+                        // //Initialize FileOutputStream for the file name
+                        // FileOutputStream fos = new FileOutputStream("Received.txt");
+                        
+                        // //Hold the total number of bytes read
+                        // int bytesRead = 0; 
+                        
+                        // //While there's still content to be read, continue to write inside the file
+                        // while((bytesRead = disReader.read(contents))!=-1)
+                        //     fos.write(contents, 0, bytesRead); 
 
-                        byte[] imageAr = new byte[size];
-                        int read = 0;
-                        try{
-                            while(read < size)
-                            {
-                                read += this.dis.read(imageAr,read,size-read); 
+                        // fos.flush(); 
+                    }
+                    else{
+                        try {
+                            byte[] sizeAr = new byte[4];
+                            this.dis.read(sizeAr);
+                            int size = ByteBuffer.wrap(sizeAr).asIntBuffer().get();
+    
+                            byte[] imageAr = new byte[size];
+                            int read = 0;
+                            try{
+                                while(read < size)
+                                {
+                                    read += this.dis.read(imageAr,read,size-read); 
+                                }
                             }
+                            catch (EOFException e){
+                                e.printStackTrace();
+                            }
+                            BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageAr));
+    
+                            this.controller.updateUIImage(false, image, file_type);
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
                         }
-                        catch (EOFException e){
-                            e.printStackTrace();
-                        }
-                        BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageAr));
-
-                        this.controller.updateUIImage(false, image, file_type);
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
                     }
                 }
                 else if (message.equals("NO CLIENT")){
@@ -195,6 +272,10 @@ public class Client extends Thread{
                 }
                 else if (message.equals("FAILRECEIVEFILE")){
                     this.controller.updateUIErrorMessage(false, "Failed to receive file");
+                }
+                else if (message.equals("SERVER CLOSED")){
+                    this.controller.updateUIErrorMessage(false, "Server Disconnected");
+                    this.controller.toggleChat(false,"");
                 }
             }
             catch(Exception e){
