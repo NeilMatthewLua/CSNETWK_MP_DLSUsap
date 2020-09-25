@@ -212,7 +212,6 @@ public class ClientInterfaceController implements Initializable{
 
     @FXML
     public void updateUIText(boolean isSent, String message, String file_type){ 
-        System.out.println("CONTROLLER ME");  
         // create a Button 
         Button save_button = new Button("Download Text File"); 
   
@@ -232,7 +231,6 @@ public class ClientInterfaceController implements Initializable{
                 } 
             } 
         }; 
-        System.out.println("AFTER CONTROLLER ME");
         save_button.setOnAction(event1); 
         
         HBox hbox=new HBox(12);

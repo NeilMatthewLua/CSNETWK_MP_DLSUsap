@@ -125,7 +125,6 @@ public class Connection extends Thread {
     public void informNoRecipient() {
         try {
             this.writer.writeUTF("NO CLIENT");
-            this.writer.writeUTF("Message from server: No other client connected.");
         }
         catch (IOException e) {
             System.out.println("Error in notifying client of disconnection."); 
@@ -138,8 +137,6 @@ public class Connection extends Thread {
     public void informDisconnect() {
         try {
             this.writer.writeUTF("DISCONNECT");
-            this.writer.writeUTF("Message from server: Client: " + this.dest + " has disconnected."); 
-            this.server.addLog(new Log(this.dest, "DISCONNECT")); 
         }
         catch (IOException e) {
             System.out.println("Error in notifying client of disconnection."); 
@@ -152,7 +149,6 @@ public class Connection extends Thread {
     public void informConnection() {
         try {
             this.writer.writeUTF("CONNECTION ESTABLISHED"); 
-            this.writer.writeUTF("Message from server: Client: " + this.dest + " is now connected. \n You may begin chatting.");
         }
         catch (IOException e) {
             System.out.println("Error in notifying client."); 
@@ -165,7 +161,6 @@ public class Connection extends Thread {
     public void informServerClose() {
         try {
             this.writer.writeUTF("SERVER CLOSED"); 
-            this.writer.writeUTF("Message from server: Server closed.");
         }
         catch (IOException e) {
             System.out.println("Error in notifying client."); 
