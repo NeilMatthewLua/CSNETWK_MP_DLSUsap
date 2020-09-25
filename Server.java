@@ -148,11 +148,13 @@ public class Server {
 				for (Thread t : clientListeners) {
 					t.interrupt();
 				}
-				// Close all client connections
+				//Close all client connections 
 				for (Connection c : clients) {
-					c.informServerClose();
-					c.cleanup();
-					c.interrupt();
+					c.informServerClose();  
+				}
+				for (Connection c : clients) {
+					c.cleanup(); 
+					c.interrupt(); 
 				}
 			} else {
 				System.out.println("Server will continue running.");

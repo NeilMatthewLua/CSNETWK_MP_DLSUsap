@@ -175,11 +175,17 @@ public class Connection extends Thread {
     }
 
     /*
+        Informs server of logout 
+    */
+    public void logout() {
+        this.server.addLog(new Log(this.source, "LOGOUT")); 
+        this.server.removeConnection(this); 
+    }
+
+    /*
         Performs I/O closing and server calls when connection is closed
     */
     public void cleanup() {
-        this.server.addLog(new Log(this.source, "LOGOUT")); 
-        this.server.removeConnection(this); 
         try {
             //Close IO streams
             socket.close(); 
@@ -241,6 +247,8 @@ public class Connection extends Thread {
                     }
                 } 
             }
+            //Inform server of logout 
+            this.logout(); 
             //Perform final cleanup before closing
             this.cleanup();
         } catch (Exception e) {
