@@ -68,13 +68,13 @@ public class Connection extends Thread {
         @param message Message to be sent 
     */
     public void writeMessage(String message) { 
-        this.server.addLog(new Log(this.source, "MESSAGE", this.dest, true, message)); 
+        this.server.addLog(new Log(this.source, "MESSAGE", this.dest, false, message)); 
         try {
             this.writer.writeUTF("MESSAGE");
             this.writer.writeUTF(message);
         }
         catch (IOException e) {
-            this.server.addLog(new Log(this.source, "FAILSENDMSG", true));
+            this.server.addLog(new Log(this.source, "FAILRECEIVEMSG", false));
         }
     }
 
@@ -83,7 +83,7 @@ public class Connection extends Thread {
         @param message Message to be sent 
     */
     public void writeMessage(BufferedImage image, String file_type) {
-        this.server.addLog(new Log(this.source, "FILE", this.dest, true)); 
+        this.server.addLog(new Log(this.source, "FILE", this.dest, false)); 
         try {
             // BufferedImage buffImage = ImageIO.read(new File(image.getPath()));
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -98,7 +98,7 @@ public class Connection extends Thread {
             writer.flush();
         }
         catch (IOException e) {
-            this.server.addLog(new Log(this.source, "FAILSENDFILE", true)); 
+            this.server.addLog(new Log(this.source, "FAILRECEIVEFILE", false)); 
         }
     }
 
@@ -107,7 +107,7 @@ public class Connection extends Thread {
         @param message Message to be sent 
     */
     public void writeMessage(String message, String file_type) {
-        this.server.addLog(new Log(this.source, "FILE", this.dest, true)); 
+        this.server.addLog(new Log(this.source, "FILE", this.dest, false)); 
         try {
             // write on the output stream
             this.writer.writeUTF("FILE");
@@ -115,7 +115,7 @@ public class Connection extends Thread {
             this.writer.writeUTF(message);
         }
         catch (IOException e) {
-            this.server.addLog(new Log(this.source, "FAILSENDFILE", true)); 
+            this.server.addLog(new Log(this.source, "FAILRECEIVEFILE", false)); 
         }
     }
      
@@ -207,10 +207,10 @@ public class Connection extends Thread {
                     try {
                         msg = reader.readUTF();
                         this.server.sendMessage(this.dest, msg); 
-                        this.server.addLog(new Log(this.source, "MESSAGE", this.dest, false, msg));
+                        this.server.addLog(new Log(this.source, "MESSAGE", this.dest, true, msg));
                     } catch (IOException e) {
-                        //If user failed to receive message
-                        this.server.addLog(new Log(this.source, "FAILRECEIVEMSG", false));
+                        //If user failed to send message
+                        this.server.addLog(new Log(this.source, "FAILSENDMSG", true));
                     }
                 }
                 else if (msg.equals("FILE")) {
@@ -240,10 +240,10 @@ public class Connection extends Thread {
                             this.server.sendMessage(this.dest, image, file_type); 
                         }
 
-                        this.server.addLog(new Log(this.source, "FILE", this.dest, false));
+                        this.server.addLog(new Log(this.source, "FILE", this.dest, true));
                     } catch (IOException ex) {
                         //Add in fail in sending 
-                        this.server.addLog(new Log(this.source, "FAILRECEIVEFILE", false));
+                        this.server.addLog(new Log(this.source, "FAILSENDFILE", true));
                     }
                 } 
             }
