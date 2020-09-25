@@ -126,11 +126,11 @@ public class Server {
 	 * Function to prompt user to close server and save logs
 	 */
 	public void promptServerClose() {
+		System.out.println("Do you wish to close the server? (Y/N)");
 		// If server is still running and if no server prompt has been initiated
 		if (this.getRunning() && isServerPromptActive.get()) {
 			isServerPromptActive.set(false);
 			// Ask the user if they want to save the logs
-			System.out.println("Do you wish to close the server? (Y/N)");
 			String choiceClose = this.scan.nextLine();
 			// Close the server
 			if (choiceClose.equals("Y")) {
