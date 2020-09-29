@@ -68,13 +68,13 @@ public class Connection extends Thread {
         @param message Message to be sent 
     */
     public void writeMessage(String message) { 
-        this.server.addLog(new Log(this.source, "MESSAGE", this.dest, true, message)); 
+        this.server.addLog(new Log(this.source, "MESSAGE", this.dest, false, message)); 
         try {
             this.writer.writeUTF("MESSAGE");
             this.writer.writeUTF(message);
         }
         catch (IOException e) {
-            this.server.addLog(new Log(this.source, "FAILSENDMSG", true));
+            this.server.addLog(new Log(this.source, "FAILRECEIVEMSG", false));
         }
     }
 
@@ -83,7 +83,7 @@ public class Connection extends Thread {
         @param message Message to be sent 
     */
     public void writeMessage(BufferedImage image, String file_type) {
-        this.server.addLog(new Log(this.source, "FILE", this.dest, true)); 
+        this.server.addLog(new Log(this.source, "FILE", this.dest, false)); 
         try {
             // BufferedImage buffImage = ImageIO.read(new File(image.getPath()));
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -98,7 +98,7 @@ public class Connection extends Thread {
             writer.flush();
         }
         catch (IOException e) {
-            this.server.addLog(new Log(this.source, "FAILSENDFILE", true)); 
+            this.server.addLog(new Log(this.source, "FAILRECEIVEFILE", false)); 
         }
     }
 
@@ -107,7 +107,7 @@ public class Connection extends Thread {
         @param message Message to be sent 
     */
     public void writeMessage(String message, String file_type) {
-        this.server.addLog(new Log(this.source, "FILE", this.dest, true)); 
+        this.server.addLog(new Log(this.source, "FILE", this.dest, false)); 
         try {
             // write on the output stream
             this.writer.writeUTF("FILE");
@@ -115,7 +115,7 @@ public class Connection extends Thread {
             this.writer.writeUTF(message);
         }
         catch (IOException e) {
-            this.server.addLog(new Log(this.source, "FAILSENDFILE", true)); 
+            this.server.addLog(new Log(this.source, "FAILRECEIVEFILE", false)); 
         }
     }
      
@@ -125,7 +125,6 @@ public class Connection extends Thread {
     public void informNoRecipient() {
         try {
             this.writer.writeUTF("NO CLIENT");
-            this.writer.writeUTF("Message from server: No other client connected.");
         }
         catch (IOException e) {
             System.out.println("Error in notifying client of disconnection."); 
@@ -138,8 +137,6 @@ public class Connection extends Thread {
     public void informDisconnect() {
         try {
             this.writer.writeUTF("DISCONNECT");
-            this.writer.writeUTF("Message from server: Client: " + this.dest + " has disconnected."); 
-            this.server.addLog(new Log(this.dest, "DISCONNECT")); 
         }
         catch (IOException e) {
             System.out.println("Error in notifying client of disconnection."); 
@@ -152,7 +149,6 @@ public class Connection extends Thread {
     public void informConnection() {
         try {
             this.writer.writeUTF("CONNECTION ESTABLISHED"); 
-            this.writer.writeUTF("Message from server: Client: " + this.dest + " is now connected. \n You may begin chatting.");
         }
         catch (IOException e) {
             System.out.println("Error in notifying client."); 
@@ -165,7 +161,6 @@ public class Connection extends Thread {
     public void informServerClose() {
         try {
             this.writer.writeUTF("SERVER CLOSED"); 
-            this.writer.writeUTF("Message from server: Server closed.");
         }
         catch (IOException e) {
             System.out.println("Error in notifying client."); 
@@ -180,11 +175,17 @@ public class Connection extends Thread {
     }
 
     /*
+        Informs server of logout 
+    */
+    public void logout() {
+        this.server.addLog(new Log(this.source, "LOGOUT")); 
+        this.server.removeConnection(this); 
+    }
+
+    /*
         Performs I/O closing and server calls when connection is closed
     */
     public void cleanup() {
-        this.server.addLog(new Log(this.source, "LOGOUT")); 
-        this.server.removeConnection(this); 
         try {
             //Close IO streams
             socket.close(); 
@@ -206,10 +207,10 @@ public class Connection extends Thread {
                     try {
                         msg = reader.readUTF();
                         this.server.sendMessage(this.dest, msg); 
-                        this.server.addLog(new Log(this.source, "MESSAGE", this.dest, false, msg));
+                        this.server.addLog(new Log(this.source, "MESSAGE", this.dest, true, msg));
                     } catch (IOException e) {
-                        //If user failed to receive message
-                        this.server.addLog(new Log(this.source, "FAILRECEIVEMSG", false));
+                        //If user failed to send message
+                        this.server.addLog(new Log(this.source, "FAILSENDMSG", true));
                     }
                 }
                 else if (msg.equals("FILE")) {
@@ -239,13 +240,15 @@ public class Connection extends Thread {
                             this.server.sendMessage(this.dest, image, file_type); 
                         }
 
-                        this.server.addLog(new Log(this.source, "FILE", this.dest, false));
+                        this.server.addLog(new Log(this.source, "FILE", this.dest, true));
                     } catch (IOException ex) {
                         //Add in fail in sending 
-                        this.server.addLog(new Log(this.source, "FAILRECEIVEFILE", false));
+                        this.server.addLog(new Log(this.source, "FAILSENDFILE", true));
                     }
                 } 
             }
+            //Inform server of logout 
+            this.logout(); 
             //Perform final cleanup before closing
             this.cleanup();
         } catch (Exception e) {

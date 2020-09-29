@@ -1,0 +1,14 @@
+Built and Compiled with Java 8 (with pre-built support for FXML)
+
+1. Compile all the java files. 
+2. Run the server using "java Server". Port number can be specified when running but by default it will listen on port 4000. 
+Ex. Running a server on port 5000 "java Server 5000". 
+3. Clients can be initialized by running "java Main". 
+4. In the client GUI, just place the IP address and port number of the server to begin the connection. 
+
+
+Closing the server
+1. When one client disconnects. The server will prompt the user if they want to close the server (Y/N). 
+If the server prompt is not answered, it will continue to wait for a response. Meanwhile, server operations will continue as is. It will prompt once more if another logout is made.
+2. When "Y" is typed, it will prompt the user if they want to save the server logs. It will include logs leading up to when 
+"Y" was typed for closing the server. 

@@ -71,7 +71,7 @@ public class Log {
             return "(" + this.timeSent + ") " + this.source + ": User logged in"; 
         }
         else if (this.activityType.equals("LOGOUT")) {
-            return "(" + this.timeSent + ") " + this.source + ": User logged out"; 
+            return "(" + this.timeSent + ") " + this.source + ": User logged out / disconnected"; 
         }
         else if (this.activityType.equals("DISCONNECT")) {
             return "(" + this.timeSent + ") " + this.source + ": User disconnected";
